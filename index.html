@@ -622,18 +622,45 @@ let currentTrack = 'A';
 let currentGenerated = null;
 let attachedImages = [];
 
+// window.storage만 Claude.ai 아티팩트 안에서 작동. 로컬 파일로 열면 없기 때문에
+// localStorage로 대체 저장해서, 어디서 열어도 설정이 유지되도록 함.
+async function storageGet(key, shared){
+  try{
+    const r = await window.storage.get(key, shared);
+    return r ? r.value : null;
+  }catch(e){
+    try{ return localStorage.getItem(key); }catch(e2){ return null; }
+  }
+}
+async function storageSet(key, value, shared){
+  try{
+    await window.storage.set(key, value, shared);
+  }catch(e){
+    try{ localStorage.setItem(key, value); }catch(e2){}
+  }
+}
+async function storageDelete(key, shared){
+  try{
+    await window.storage.delete(key, shared);
+  }catch(e){
+    try{ localStorage.removeItem(key); }catch(e2){}
+  }
+}
+
+// URL 자체는 비밀값이 아니라 기본값으로 심어둠 (팀 코드는 보안상 여기 넣지 않음 — 각 브라우저에서 1회 입력)
+const DEFAULT_PROXY_URL = 'https://hookdesk-proxy.eunaej34.workers.dev';
+
 let _proxyCache = null;
 async function getProxySettings(){
   if(_proxyCache) return _proxyCache;
-  try{
-    const r = await window.storage.get('settings:proxy', true);
-    _proxyCache = r && r.value ? JSON.parse(r.value) : { url:'', code:'' };
-  }catch(e){ _proxyCache = { url:'', code:'' }; }
+  const raw = await storageGet('settings:proxy', true);
+  _proxyCache = raw ? JSON.parse(raw) : { url:'', code:'' };
+  if(!_proxyCache.url) _proxyCache.url = DEFAULT_PROXY_URL;
   return _proxyCache;
 }
 async function saveProxySettings(url, code){
   _proxyCache = { url, code };
-  try{ await window.storage.set('settings:proxy', JSON.stringify(_proxyCache), true); }catch(e){}
+  await storageSet('settings:proxy', JSON.stringify(_proxyCache), true);
 }
 async function initProxyUI(){
   const s = await getProxySettings();
@@ -804,15 +831,11 @@ function todayStr(){ return new Date().toISOString().slice(0,10); }
 function fmtDate(d){ if(!d) return '-'; return d; }
 
 async function getArr(key){
-  try{
-    const r = await window.storage.get(key, true);
-    return r && r.value ? JSON.parse(r.value) : [];
-  }catch(e){ return []; }
+  const raw = await storageGet(key, true);
+  try{ return raw ? JSON.parse(raw) : []; }catch(e){ return []; }
 }
 async function saveArr(key, arr){
-  try{
-    await window.storage.set(key, JSON.stringify(arr), true);
-  }catch(e){ console.error('storage save failed', e); }
+  await storageSet(key, JSON.stringify(arr), true);
 }
 
 async function loadAll(){
@@ -1392,7 +1415,7 @@ function renderLibrary(){
       state.cardnews = state.cardnews.filter(i=>i.id!==id);
       await saveArr('cardnews:items', state.cardnews);
       if(item && item.hasImages){
-        try{ await window.storage.delete('cardnews:img:' + id, true); }catch(err){}
+        await storageDelete('cardnews:img:' + id, true);
       }
       renderLibrary(); renderHome();
     });
@@ -1691,12 +1714,10 @@ document.getElementById('brand-home').addEventListener('click', ()=>{
 });
 
 async function loadOpenChat(){
-  try{
-    const r = await window.storage.get('settings:openchat', true);
-    const url = r && r.value ? JSON.parse(r.value).url : '';
-    document.getElementById('openchat-url').value = url || '';
-    renderOpenChat(url);
-  }catch(e){ /* no saved link yet */ }
+  const raw = await storageGet('settings:openchat', true);
+  const url = raw ? (JSON.parse(raw).url || '') : '';
+  document.getElementById('openchat-url').value = url || '';
+  renderOpenChat(url);
 }
 function renderOpenChat(url){
   const display = document.getElementById('openchat-display');
@@ -1708,7 +1729,7 @@ function renderOpenChat(url){
 document.getElementById('btn-save-openchat').addEventListener('click', async ()=>{
   const url = document.getElementById('openchat-url').value.trim();
   if(!url){ alert('오픈채팅방 링크를 입력해주세요.'); return; }
-  try{ await window.storage.set('settings:openchat', JSON.stringify({ url }), true); }catch(e){}
+  await storageSet('settings:openchat', JSON.stringify({ url }), true);
   renderOpenChat(url);
 });
 loadOpenChat();
