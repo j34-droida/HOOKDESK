@@ -1,0 +1,1719 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>트랙 운영 콘솔</title>
+<style>
+  :root{
+    --navy:#1B2A4A;
+    --navy-light:#2E4166;
+    --ivory:#FAF7F0;
+    --card:#FFFFFF;
+    --charcoal:#3A3A3A;
+    --muted:#8A8578;
+    --border:#E4DECF;
+    --gold:#B8975A;
+    --gold-deep:#8C6F3E;
+    --track-a:#3C6E71;
+    --track-a-bg:#E1F0EF;
+    --track-b:#8C6F3E;
+    --track-b-bg:#F3EBDA;
+    --track-c:#9C5B42;
+    --track-c-bg:#F3E3DC;
+    --danger:#A23B3B;
+    --danger-bg:#F5E4E4;
+    --ok:#3C6E71;
+    --ok-bg:#E1F0EF;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;}
+  #app{
+    font-family:'Pretendard','Malgun Gothic',-apple-system,BlinkMacSystemFont,sans-serif;
+    color:var(--charcoal);
+    background:var(--ivory);
+    display:flex;
+    min-height:640px;
+    border:1px solid var(--border);
+    border-radius:14px;
+    overflow:hidden;
+  }
+  .sidebar{
+    width:216px;
+    flex-shrink:0;
+    background:var(--navy);
+    color:#EFE9DC;
+    padding:24px 14px;
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+  }
+  .brand{
+    font-size:15px;
+    font-weight:700;
+    letter-spacing:0.2px;
+    color:#fff;
+    padding:0 10px 20px;
+    line-height:1.4;
+  }
+  .brand small{
+    display:block;
+    font-weight:400;
+    font-size:11.5px;
+    color:#B9C0D4;
+    margin-top:4px;
+  }
+  .navitem{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:10px 12px;
+    border-radius:8px;
+    font-size:13.5px;
+    font-weight:500;
+    cursor:pointer;
+    color:#D9DEEC;
+    user-select:none;
+  }
+  .navitem:hover{ background:rgba(255,255,255,0.06); }
+  .navitem.active{ background:rgba(255,255,255,0.12); color:#fff; }
+  .navitem svg{ flex-shrink:0; opacity:0.9; }
+  .main{
+    flex:1;
+    padding:28px 32px 40px;
+    overflow-y:auto;
+    min-width:0;
+  }
+  .pagehead{ margin-bottom:22px; }
+  .pagehead h1{ font-size:20px; font-weight:700; margin:0 0 6px; color:var(--navy); }
+  .pagehead p{ font-size:13px; color:var(--muted); margin:0; line-height:1.6; }
+  .panel{ display:none; }
+  .panel.active{ display:block; }
+
+  .cardbox{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:20px 22px;
+    margin-bottom:18px;
+  }
+  .cardbox h3{ font-size:14px; font-weight:700; margin:0 0 14px; color:var(--navy); }
+
+  .track-select{ display:flex; gap:8px; margin-bottom:16px; }
+  .track-btn{
+    flex:1;
+    padding:12px 10px;
+    border-radius:9px;
+    border:1.5px solid var(--border);
+    background:#fff;
+    cursor:pointer;
+    text-align:left;
+    font-size:12.5px;
+  }
+  .track-btn b{ display:block; font-size:13.5px; margin-bottom:2px; }
+  .track-btn.a.selected{ border-color:var(--track-a); background:var(--track-a-bg); }
+  .track-btn.b.selected{ border-color:var(--track-b); background:var(--track-b-bg); }
+  .track-btn.c.selected{ border-color:var(--track-c); background:var(--track-c-bg); }
+  .track-btn.a b{ color:var(--track-a); }
+  .track-btn.b b{ color:var(--track-b); }
+  .track-btn.c b{ color:var(--track-c); }
+
+  .field-row{ display:flex; gap:12px; flex-wrap:wrap; margin-bottom:12px; }
+  .field{ display:flex; flex-direction:column; gap:5px; flex:1; min-width:150px; }
+  .field label{ font-size:12px; font-weight:600; color:var(--charcoal); }
+  .field select, .field input, .field textarea{
+    font-family:inherit;
+    font-size:13px;
+    padding:8px 10px;
+    border:1px solid var(--border);
+    border-radius:7px;
+    background:#fff;
+    color:var(--charcoal);
+  }
+  .field textarea{ resize:vertical; min-height:60px; }
+
+  .btn{
+    font-family:inherit;
+    font-size:13px;
+    font-weight:600;
+    padding:9px 16px;
+    border-radius:8px;
+    border:1px solid var(--navy);
+    background:var(--navy);
+    color:#fff;
+    cursor:pointer;
+  }
+  .btn:hover{ background:var(--navy-light); }
+  .btn.secondary{ background:#fff; color:var(--navy); border-color:var(--border); }
+  .btn.secondary:hover{ background:var(--ivory); }
+  .btn.small{ padding:6px 11px; font-size:12px; }
+  .btn:disabled{ opacity:0.55; cursor:default; }
+
+  .badge{ display:inline-block; padding:3px 9px; border-radius:20px; font-size:11px; font-weight:700; }
+  .badge.a{ background:var(--track-a-bg); color:var(--track-a); }
+  .badge.b{ background:var(--track-b-bg); color:var(--track-b); }
+  .badge.c{ background:var(--track-c-bg); color:var(--track-c); }
+  .badge.status-ok{ background:var(--ok-bg); color:var(--ok); }
+  .badge.status-pending{ background:#F3EBDA; color:var(--gold-deep); }
+  .badge.status-muted{ background:#EFEDE7; color:var(--muted); }
+
+  .errbox{ background:var(--danger-bg); color:var(--danger); font-size:12.5px; padding:10px 12px; border-radius:8px; margin-bottom:12px; display:none; }
+
+  .slide-grid{ display:flex; flex-wrap:wrap; gap:16px; margin-top:14px; }
+  .slide-unit{ display:flex; flex-direction:column; align-items:center; gap:8px; }
+  .vslide{
+    width:300px; height:375px;
+    position:relative;
+    overflow:hidden;
+    border-radius:6px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    padding:34px 30px;
+    font-family:'Pretendard','Malgun Gothic',-apple-system,sans-serif;
+    box-shadow:0 1px 3px rgba(0,0,0,0.15);
+  }
+  .vslide.a{ background:#1E3E42; }
+  .vslide.b{ background:#6E551E; }
+  .vslide.c{ background:#5C2C1F; }
+  .vslide[style*="background-color"]{ }
+  .palette-tag{ font-size:11px; color:var(--muted); margin-bottom:6px; }
+  .vslide .accentbar{ position:absolute; top:0; left:0; right:0; height:6px; background:var(--gold); }
+  .vslide .eyebrow{
+    font-size:11px; font-weight:700; letter-spacing:0.3px; color:#D4B983;
+    margin-bottom:14px; text-transform:none;
+  }
+  .vslide .pagepill{
+    position:absolute; bottom:18px; right:20px;
+    font-size:10.5px; font-weight:700; color:rgba(255,255,255,0.55);
+  }
+  .vslide.cover .headline{ font-size:30px; line-height:1.32; }
+  .vslide .headline{
+    font-size:22px; font-weight:700; color:#fff; line-height:1.38;
+    margin-bottom:14px; word-break:keep-all;
+  }
+  .vslide .rule{ width:34px; height:3px; background:var(--gold); margin-bottom:14px; border-radius:2px; }
+  .vslide .body{ font-size:14px; color:rgba(255,255,255,0.86); line-height:1.6; word-break:keep-all; }
+  .vslide.cover .body{ font-size:14.5px; color:#EFE6D2; }
+  .slide-dl-btn{
+    font-family:inherit; font-size:11.5px; font-weight:600;
+    padding:5px 12px; border-radius:7px; border:1px solid var(--border);
+    background:#fff; color:var(--navy); cursor:pointer;
+  }
+  .slide-dl-btn:hover{ background:var(--ivory); }
+  .vslide.has-img .headline, .vslide.has-img .body, .vslide.has-img .eyebrow{ color:#fff; position:relative; z-index:2; }
+  .vslide.has-img::before{
+    content:''; position:absolute; inset:0;
+    background:rgba(20,16,12,0.5); z-index:1;
+  }
+  .vslide .bgimg{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; z-index:0; }
+  .vslide .rule{ position:relative; z-index:2; }
+  .vslide .accentbar{ z-index:3; }
+  .vslide .pagepill{ z-index:3; }
+  .slide-imgpick{ font-family:inherit; font-size:11px; padding:4px 6px; border:1px solid var(--border); border-radius:6px; width:300px; margin-bottom:4px; }
+
+  .dropzone{
+    border:1.5px dashed var(--border);
+    border-radius:10px;
+    padding:22px 16px;
+    text-align:center;
+    font-size:12.5px;
+    color:var(--muted);
+    cursor:pointer;
+    margin-bottom:12px;
+  }
+  .dropzone.drag{ border-color:var(--gold); background:var(--track-b-bg); color:var(--gold-deep); }
+  .image-gallery{ display:flex; flex-wrap:wrap; gap:10px; margin-bottom:6px; }
+  .img-thumb{ position:relative; width:76px; height:76px; border-radius:8px; overflow:hidden; border:1px solid var(--border); }
+  .img-thumb img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .img-thumb .rm{
+    position:absolute; top:3px; right:3px; width:18px; height:18px; border-radius:50%;
+    background:rgba(20,16,12,0.7); color:#fff; border:none; font-size:12px; line-height:1;
+    cursor:pointer; display:flex; align-items:center; justify-content:center;
+  }
+  .reflink-chip{
+    display:inline-flex; align-items:center; gap:7px; font-size:12px; background:var(--ivory);
+    border:1px solid var(--border); padding:5px 10px; border-radius:16px; margin:0 6px 6px 0;
+    max-width:100%;
+  }
+  .reflink-chip a{ color:var(--navy); text-decoration:none; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:220px; }
+  .reflink-chip .rm{ cursor:pointer; color:var(--muted); font-weight:700; border:none; background:none; font-size:13px; padding:0; }
+
+  table{ width:100%; border-collapse:collapse; font-size:12.5px; }
+  th{ text-align:left; padding:9px 10px; background:var(--navy); color:#fff; font-weight:600; font-size:11.5px; }
+  th:first-child{ border-radius:7px 0 0 0; }
+  th:last-child{ border-radius:0 7px 0 0; }
+  td{ padding:9px 10px; border-bottom:1px solid var(--border); vertical-align:top; }
+  tr:last-child td{ border-bottom:none; }
+  td select, td input{ font-family:inherit; font-size:12px; padding:5px 6px; border:1px solid var(--border); border-radius:5px; width:100%; }
+
+  .toolbar{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:14px; }
+  .toolbar select, .toolbar input{ font-family:inherit; font-size:12.5px; padding:7px 9px; border:1px solid var(--border); border-radius:7px; }
+  .toolbar .spacer{ flex:1; }
+
+  .empty{ text-align:center; padding:36px 16px; color:var(--muted); font-size:13px; }
+  .empty b{ display:block; color:var(--charcoal); font-size:14px; margin-bottom:5px; }
+
+  .metric-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:12px; margin-bottom:22px; }
+  .metric{ background:var(--card); border:1px solid var(--border); border-radius:11px; padding:16px 16px; }
+  .metric .lbl{ font-size:11.5px; color:var(--muted); margin-bottom:6px; }
+  .metric .val{ font-size:24px; font-weight:700; color:var(--navy); }
+
+  .item-row{ border:1px solid var(--border); border-radius:10px; padding:14px 16px; margin-bottom:10px; background:#fff; }
+  .item-top{ display:flex; align-items:center; gap:8px; margin-bottom:6px; flex-wrap:wrap; }
+  .item-title{ font-size:13.5px; font-weight:700; color:var(--navy); }
+  .item-meta{ font-size:11.5px; color:var(--muted); margin-bottom:8px; }
+  .item-caption{ font-size:12.5px; color:var(--charcoal); line-height:1.6; margin-bottom:10px; }
+  .item-actions{ display:flex; gap:8px; flex-wrap:wrap; }
+  .upload-form{ margin-top:10px; padding:12px; background:var(--ivory); border-radius:8px; display:none; }
+  .upload-form.open{ display:block; }
+  .upload-list{ margin-top:8px; }
+  .upload-chip{ display:inline-flex; align-items:center; gap:6px; font-size:11.5px; background:var(--ok-bg); color:var(--ok); padding:4px 9px; border-radius:14px; margin:3px 4px 0 0; }
+
+  .add-form{ display:none; margin-bottom:16px; }
+  .add-form.open{ display:block; }
+
+  .hint{ font-size:11.5px; color:var(--muted); margin-top:4px; }
+
+  @media (max-width:760px){
+    #app{ flex-direction:column; }
+    .sidebar{ width:100%; flex-direction:row; overflow-x:auto; padding:12px; }
+    .brand{ display:none; }
+    .navitem{ white-space:nowrap; }
+    .main{ padding:20px 16px 32px; }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="sidebar">
+    <div class="brand" id="brand-home" style="cursor:pointer;" title="리드 리스트로 바로 가기">트랙 운영 콘솔<small>카드뉴스 · DM · 계약 관리</small></div>
+    <div class="navitem active" data-tab="home">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>
+      대시보드
+    </div>
+    <div class="navitem" data-tab="gen">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>
+      카드뉴스 생성
+    </div>
+    <div class="navitem" data-tab="lib">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="7" height="16" rx="1.5"/><rect x="14" y="4" width="7" height="10" rx="1.5"/></svg>
+      라이브러리
+    </div>
+    <div class="navitem" data-tab="dm">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h16v12H7l-3 3V5z"/></svg>
+      DM 아웃리치
+    </div>
+    <div class="navitem" data-tab="contracts">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3h9l4 4v14H6z"/><path d="M9 12h6M9 16h6"/></svg>
+      계약·제휴
+    </div>
+    <div class="navitem" data-tab="score">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19h16"/><path d="M7 19v-6M12 19V6M17 19v-10"/></svg>
+      계정 지수
+    </div>
+    <div class="navitem" data-tab="leads">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      리드 리스트
+    </div>
+  </div>
+
+  <div class="main">
+
+    <div class="panel active" id="panel-home">
+      <div class="pagehead">
+        <h1>대시보드</h1>
+        <p>트랙 A·B·C 운영 현황을 한눈에 확인합니다.</p>
+      </div>
+      <div class="metric-grid" id="metric-grid"></div>
+      <div class="cardbox">
+        <h3>최근 활동</h3>
+        <div id="recent-list"></div>
+      </div>
+    </div>
+
+    <div class="panel" id="panel-gen">
+      <div class="pagehead">
+        <h1>카드뉴스 생성</h1>
+        <p>트랙을 선택하고 필요한 정보를 입력하면 초안을 생성합니다. 회사명·법인명은 자동으로 배제됩니다.</p>
+      </div>
+      <div class="errbox" id="gen-error"></div>
+
+      <div class="cardbox" style="border-color:var(--gold);">
+        <h3>⚙ 프록시 서버 설정 (팀 전체 공용, 1회만 설정)</h3>
+        <div class="hint" style="margin-bottom:10px;">개별 로그인 없이 팀원 전체가 회사 API 크레딧으로 생성하려면, Cloudflare Worker 주소와 팀 코드를 입력하세요. 비워두면 이 화면을 Claude.ai 아티팩트로 열었을 때만 작동합니다.</div>
+        <div class="field-row">
+          <div class="field" style="flex:2;"><label>프록시 서버 URL</label><input type="text" id="proxy-url" placeholder="https://cardnews-proxy.내계정.workers.dev" /></div>
+          <div class="field"><label>팀 코드</label><input type="text" id="proxy-code" placeholder="팀 코드" /></div>
+          <div class="field" style="flex:0;align-self:flex-end;"><button class="btn secondary small" id="btn-save-proxy" type="button">저장</button></div>
+        </div>
+        <span class="hint" id="proxy-status"></span>
+      </div>
+
+      <div class="cardbox">
+        <h3>1. 트랙 선택</h3>
+        <div class="track-select">
+          <div class="track-btn a selected" data-track="A"><b>트랙 A</b>국내거주 외국인 에이전트 모집</div>
+          <div class="track-btn b" data-track="B"><b>트랙 B</b>해외 인플루언서·연예인 섭외</div>
+          <div class="track-btn c" data-track="C"><b>트랙 C</b>병원·식당·헤어메이크업 광고주 모집</div>
+        </div>
+
+        <h3>2. 세부 정보</h3>
+        <div class="field-row" id="track-fields"></div>
+
+        <div class="field-row">
+          <div class="field">
+            <label>출력 언어</label>
+            <select id="f-language">
+              <option value="한국어">한국어</option>
+              <option value="일본어">일본어</option>
+              <option value="중국어(번체)">중국어(번체)</option>
+              <option value="영어">영어</option>
+              <option value="러시아어">러시아어</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>슬라이드 수</label>
+            <select id="f-slides">
+              <option value="4">4장</option>
+              <option value="5" selected>5장</option>
+              <option value="6">6장</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>톤 강도</label>
+            <select id="f-tone">
+              <option value="standard">표준</option>
+              <option value="casual" selected>구어체·유행어 강하게</option>
+            </select>
+          </div>
+        </div>
+        <div class="hint" style="margin-bottom:10px;">AI가 해당 언어로 직접 작성해 번역기보다 자연스럽지만, 최신 업계 슬랭까지는 완벽하지 않을 수 있어요. 게시 전 원어민 검수를 권장합니다.</div>
+        <div class="field-row">
+          <div class="field" style="min-width:100%;">
+            <label>추가 요청사항 (선택)</label>
+            <textarea id="f-brief" placeholder="예: 지원방법 항목은 빼고 활동지역만 강조해줘 / 수수료 구조는 언급하지 말아줘 / 배경은 어두운 톤으로 / 피부과 리프팅 시술 기준, 20대 여성 타겟으로"></textarea>
+            <div class="hint">내용 추가·삭제 지시("~은 빼줘", "~를 더 강조해줘")나 디자인 지시("어두운 톤으로", "숫자를 크게")를 자유롭게 적을 수 있어요.</div>
+          </div>
+        </div>
+
+        <h3 style="margin-top:18px;">3. 레퍼런스 링크 (선택)</h3>
+        <div class="hint" style="margin-bottom:8px;">참고할 페이지나 자료 링크를 붙여넣으면 톤 참고용으로 함께 저장됩니다.</div>
+        <div class="field-row">
+          <div class="field" style="flex:1;"><input type="text" id="f-reflink" placeholder="https://..." /></div>
+          <div class="field" style="flex:0;align-self:flex-end;"><button class="btn secondary small" type="button" id="btn-add-reflink">추가</button></div>
+        </div>
+        <div id="reflink-list"></div>
+
+        <h3 style="margin-top:18px;">4. 이미지 첨부 (선택)</h3>
+        <div class="hint" style="margin-bottom:8px;">드래그해서 놓거나, 이미지를 복사해서 붙여넣기(Ctrl+V)하세요. 슬라이드 배경으로 사용하거나 카피 생성 시 참고 이미지로 활용됩니다.<br/>최대 <b>10장</b>, 장당 원본 <b>20MB</b>까지 — 올리면 자동으로 압축해서 평균 100~300KB로 줄여줘요. 용량 걱정 없이 그냥 올리시면 됩니다.</div>
+        <div class="dropzone" id="dropzone" tabindex="0">이미지를 여기에 드래그하거나 클릭해서 선택 · 붙여넣기(Ctrl+V) 가능</div>
+        <input type="file" id="file-input" accept="image/*" multiple style="display:none;" />
+        <div class="image-gallery" id="image-gallery"></div>
+        <div class="hint" id="image-status"></div>
+
+        <button class="btn" id="btn-generate-outline" style="margin-top:6px;">기획안 미리보기 생성</button>
+      </div>
+
+      <div class="cardbox" id="outline-box" style="display:none;">
+        <h3>기획안 미리보기</h3>
+        <div class="hint" style="margin-bottom:10px;">각 슬라이드에 어떤 내용이 들어갈지 검토하고 자유롭게 수정하세요. 마음에 들면 아래 버튼으로 최종 카드뉴스를 생성합니다.</div>
+        <div id="outline-list"></div>
+        <div style="margin-top:14px;display:flex;gap:10px;">
+          <button class="btn secondary" id="btn-regen-outline">다른 기획안 보기</button>
+          <button class="btn" id="btn-generate-from-outline">이 기획안으로 카드뉴스 생성</button>
+        </div>
+      </div>
+
+      <div class="cardbox" id="preview-box" style="display:none;">
+        <h3>미리보기</h3>
+        <div class="hint" style="margin-bottom:10px;">각 슬라이드는 1080×1350(4:5) 비율 PNG로 저장되어 인스타그램·페이스북·틱톡에 바로 업로드할 수 있습니다.</div>
+        <div id="preview-title" style="font-size:15px;font-weight:700;color:var(--navy);margin-bottom:6px;"></div>
+        <div id="preview-caption" style="font-size:12.5px;color:var(--charcoal);line-height:1.6;margin-bottom:4px;"></div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+          <span class="palette-tag" id="preview-palette-tag"></span>
+          <button class="btn small secondary" id="btn-reroll-palette">다른 톤으로 보기</button>
+        </div>
+        <div class="slide-grid" id="preview-slides"></div>
+        <div style="margin-top:16px;display:flex;gap:10px;">
+          <button class="btn" id="btn-save-lib">라이브러리에 저장</button>
+          <button class="btn secondary" id="btn-download-all">전체 이미지 다운로드</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" id="panel-lib">
+      <div class="pagehead">
+        <h1>카드뉴스 라이브러리</h1>
+        <p>생성된 카드뉴스와 업로드 현황을 관리합니다.</p>
+      </div>
+      <div class="toolbar">
+        <select id="lib-filter-track">
+          <option value="">전체 트랙</option>
+          <option value="A">트랙 A</option>
+          <option value="B">트랙 B</option>
+          <option value="C">트랙 C</option>
+        </select>
+        <select id="lib-filter-status">
+          <option value="">전체 상태</option>
+          <option value="생성됨">생성됨</option>
+          <option value="업로드됨">업로드됨</option>
+        </select>
+        <div class="spacer"></div>
+      </div>
+      <div id="lib-list"></div>
+    </div>
+
+    <div class="panel" id="panel-dm">
+      <div class="pagehead">
+        <h1>DM 아웃리치 모니터링</h1>
+        <p>어느 계정으로 누구에게 DM을 보냈고, 응답이 왔는지 추적합니다.</p>
+      </div>
+
+      <div class="cardbox" style="border-color:var(--gold);">
+        <h3>오픈채팅방 유입 허브</h3>
+        <div class="hint" style="margin-bottom:10px;">카카오톡 오픈채팅방은 앱 안에 직접 넣을 수 없어서, 링크·QR코드를 한곳에서 관리하는 용도예요. 카카오톡이 없으면 못 들어가니, 해외 인플루언서(트랙 B)에게는 인스타 DM/왓츠앱을 쓰는 게 낫습니다.</div>
+        <div class="field-row">
+          <div class="field" style="flex:1;"><input type="text" id="openchat-url" placeholder="https://open.kakao.com/o/..." /></div>
+          <div class="field" style="flex:0;align-self:flex-end;"><button class="btn secondary small" id="btn-save-openchat" type="button">저장</button></div>
+        </div>
+        <div id="openchat-display" style="display:none;margin-top:12px;">
+          <div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;">
+            <img id="openchat-qr" alt="오픈채팅방 QR코드" width="140" height="140" style="border:1px solid var(--border);border-radius:8px;" />
+            <div style="flex:1;min-width:200px;">
+              <button class="btn small" id="btn-open-openchat" type="button" style="margin-bottom:8px;">오픈채팅방 열기</button>
+              <div class="hint">QR코드는 오프라인 전단지·포스터용으로 우클릭 저장해서 쓰시면 돼요.</div>
+              <div class="hint" style="margin-top:6px;">유입 채널 체크리스트: 인스타·틱톡 프로필 링크 · DM 자동응답 · 당근·모델나라 게시글 · 오프라인 QR</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <select id="dm-filter-track"><option value="">전체 트랙</option><option value="A">트랙 A</option><option value="B">트랙 B</option><option value="C">트랙 C</option></select>
+        <input type="text" id="dm-search" placeholder="대상 ID / 업체명 검색" />
+        <div class="spacer"></div>
+        <button class="btn small" id="btn-add-dm">+ 새 항목 추가</button>
+      </div>
+      <div class="add-form cardbox" id="dm-add-form">
+        <div class="field-row">
+          <div class="field"><label>트랙</label><select id="dm-track"><option value="A">A</option><option value="B">B</option><option value="C">C</option></select></div>
+          <div class="field"><label>국가</label><select id="dm-country"><option>국내</option><option>일본</option><option>대만</option><option>홍콩</option><option>영미권</option><option>CIS</option></select></div>
+          <div class="field"><label>플랫폼</label><input type="text" id="dm-platform" placeholder="Instagram / LINE 등" /></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>서브계정 ID</label><input type="text" id="dm-account" placeholder="예: JP-DM-03" /></div>
+          <div class="field"><label>대상 ID / 업체명</label><input type="text" id="dm-target" /></div>
+          <div class="field"><label>발송일시</label><input type="date" id="dm-date" /></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>메시지 유형</label><select id="dm-msgtype"><option>최초 DM</option><option>2차 팔로업</option></select></div>
+          <div class="field"><label>담당</label><input type="text" id="dm-owner" /></div>
+          <div class="field"><label>다음 액션</label><input type="text" id="dm-next" placeholder="재발송 예정일 등" /></div>
+        </div>
+        <button class="btn small" id="btn-save-dm">추가</button>
+        <button class="btn small secondary" id="btn-cancel-dm">취소</button>
+      </div>
+      <div id="dm-table-wrap"></div>
+    </div>
+
+    <div class="panel" id="panel-contracts">
+      <div class="pagehead">
+        <h1>계약·제휴 모니터링</h1>
+        <p>광고주·인플루언서·에이전트와의 계약 진행 단계를 관리합니다.</p>
+      </div>
+      <div class="toolbar">
+        <select id="ct-filter-track"><option value="">전체 트랙</option><option value="A">트랙 A</option><option value="B">트랙 B</option><option value="C">트랙 C</option></select>
+        <select id="ct-filter-status">
+          <option value="">전체 상태</option>
+          <option>리스트업</option><option>제안</option><option>협의중</option><option>계약완료</option><option>보류</option><option>종료</option>
+        </select>
+        <div class="spacer"></div>
+        <button class="btn small" id="btn-add-ct">+ 새 항목 추가</button>
+      </div>
+      <div class="add-form cardbox" id="ct-add-form">
+        <div class="field-row">
+          <div class="field"><label>트랙</label><select id="ct-track"><option value="A">A</option><option value="B">B</option><option value="C">C</option></select></div>
+          <div class="field"><label>대상명</label><input type="text" id="ct-name" placeholder="업체명 / 인플루언서명" /></div>
+          <div class="field"><label>국가</label><select id="ct-country"><option>국내</option><option>일본</option><option>대만</option><option>홍콩</option><option>영미권</option><option>CIS</option></select></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>상태</label><select id="ct-status"><option>리스트업</option><option>제안</option><option>협의중</option><option>계약완료</option><option>보류</option><option>종료</option></select></div>
+          <div class="field"><label>계약일</label><input type="date" id="ct-date" /></div>
+          <div class="field"><label>담당자</label><input type="text" id="ct-owner" /></div>
+        </div>
+        <div class="field-row">
+          <div class="field" style="min-width:100%;"><label>조건 / 메모</label><textarea id="ct-note" placeholder="수수료율, 특이사항 등"></textarea></div>
+        </div>
+        <button class="btn small" id="btn-save-ct">추가</button>
+        <button class="btn small secondary" id="btn-cancel-ct">취소</button>
+      </div>
+      <div id="ct-table-wrap"></div>
+    </div>
+
+    <div class="panel" id="panel-score">
+      <div class="pagehead">
+        <h1>계정 지수 조회</h1>
+        <p>무료로 쓸 수 있는 기존 서비스에 바로 연결합니다. 자체 지수를 만들지 않고, 신뢰도 있는 외부 서비스를 그대로 활용해요.</p>
+      </div>
+      <div class="cardbox">
+        <h3>Social Blade — 인스타그램·틱톡·유튜브·트위터</h3>
+        <div class="hint" style="margin-bottom:10px;">팔로워 추이, 참여율, 랭킹 등급을 무료로 볼 수 있어요. 아이디만 입력하면 바로 이동합니다.</div>
+        <div class="field-row">
+          <div class="field"><label>플랫폼</label>
+            <select id="sb-platform">
+              <option value="instagram">인스타그램</option>
+              <option value="tiktok">틱톡</option>
+              <option value="youtube">유튜브</option>
+              <option value="twitter">트위터(X)</option>
+            </select>
+          </div>
+          <div class="field" style="flex:2;"><label>아이디(@ 제외)</label><input type="text" id="sb-username" placeholder="예: seoulbeautynote" /></div>
+        </div>
+        <button class="btn" id="btn-open-sb">Social Blade에서 조회</button>
+      </div>
+
+      <div class="cardbox">
+        <h3>HypeAuditor — 인스타그램 무료 간편 진단</h3>
+        <div class="hint" style="margin-bottom:10px;">팔로워 진위성(가짜 팔로워 비율)을 무료로 간단히 확인할 수 있어요. 사이트에서 아이디를 직접 입력해주세요.</div>
+        <button class="btn secondary" id="btn-open-ha">HypeAuditor 무료 진단 열기</button>
+      </div>
+
+      <div class="cardbox">
+        <h3>블로그 지수 (일본·대만·홍콩)</h3>
+        <div class="hint">참고: 네이버 블로그 지수를 확인해주던 '블덱스'는 네이버 API 접근이 막혀 2025년 12월 서비스가 종료되었습니다. 지금은 각 블로그 플랫폼 자체 통계(관리자 페이지 &gt; 통계)를 확인하는 것이 가장 정확해요.</div>
+        <ul style="font-size:12.5px;color:var(--charcoal);line-height:1.8;padding-left:18px;margin:10px 0 0;">
+          <li>아메바블로그: 블로그 관리 &gt; 액세스 분석 (본인 블로그만 무료 열람)</li>
+          <li>Pixnet(대만): 블로그 후台 &gt; 流量統計 (본인 블로그만 무료 열람)</li>
+          <li>샤오홍슈(홍콩): 계정 후台 &gt; 数据中心 (크리에이터 계정 전환 시 무료 열람)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="panel" id="panel-leads">
+      <div class="pagehead">
+        <h1>리드 리스트</h1>
+        <p>공개 입력 페이지로 들어온 SNS 계정이 여기에 누적됩니다. 프록시 서버 설정이 먼저 되어있어야 해요.</p>
+      </div>
+      <div class="cardbox" style="border-color:var(--gold);">
+        <h3>공개 입력 페이지 QR코드</h3>
+        <div class="hint" style="margin-bottom:10px;">이 QR을 인쇄물·명함·오픈채팅방에 올려두면, 스캔한 사람이 자기 SNS 계정을 직접 입력하고 그 결과가 아래 리스트에 누적됩니다.</div>
+        <div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;" id="leads-qr-wrap">
+          <div class="empty" style="padding:16px;">위에서 프록시 서버 URL을 먼저 저장해주세요.</div>
+        </div>
+      </div>
+      <div class="toolbar">
+        <button class="btn small secondary" id="btn-refresh-leads">새로고침</button>
+        <span class="hint" id="leads-status"></span>
+      </div>
+      <div id="leads-table-wrap"></div>
+    </div>
+
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+const TRACK_LABEL = { A:'트랙 A', B:'트랙 B', C:'트랙 C' };
+const TRACK_CLASS = { A:'a', B:'b', C:'c' };
+
+let state = { cardnews: [], outreach: [], contracts: [] };
+let currentTrack = 'A';
+let currentGenerated = null;
+let attachedImages = [];
+
+let _proxyCache = null;
+async function getProxySettings(){
+  if(_proxyCache) return _proxyCache;
+  try{
+    const r = await window.storage.get('settings:proxy', true);
+    _proxyCache = r && r.value ? JSON.parse(r.value) : { url:'', code:'' };
+  }catch(e){ _proxyCache = { url:'', code:'' }; }
+  return _proxyCache;
+}
+async function saveProxySettings(url, code){
+  _proxyCache = { url, code };
+  try{ await window.storage.set('settings:proxy', JSON.stringify(_proxyCache), true); }catch(e){}
+}
+async function initProxyUI(){
+  const s = await getProxySettings();
+  document.getElementById('proxy-url').value = s.url || '';
+  document.getElementById('proxy-code').value = s.code || '';
+}
+document.getElementById('btn-save-proxy').addEventListener('click', async ()=>{
+  const url = document.getElementById('proxy-url').value.trim();
+  const code = document.getElementById('proxy-code').value.trim();
+  await saveProxySettings(url, code);
+  const status = document.getElementById('proxy-status');
+  status.textContent = '저장됨 — 팀 전체가 이 설정을 공유합니다.';
+  setTimeout(()=>{ status.textContent = ''; }, 2500);
+});
+initProxyUI();
+let slideImageMap = {};
+let refLinks = [];
+
+const MAX_IMAGES = 10;
+const MAX_ORIGINAL_BYTES = 20 * 1024 * 1024; // 20MB 원본 상한
+const TARGET_MAX_BYTES = 700 * 1024; // 압축 후 장당 목표 상한(~700KB)
+
+function dataUrlBytes(dataUrl){
+  const b64 = dataUrl.split(',')[1] || '';
+  return Math.round(b64.length * 0.75);
+}
+
+function resizeImageFile(file, maxDim=900, quality=0.78){
+  return new Promise((resolve,reject)=>{
+    const reader = new FileReader();
+    reader.onload = e=>{
+      const img = new Image();
+      img.onload = ()=>{
+        let w = img.width, h = img.height;
+        if(w>=h && w>maxDim){ h = Math.round(h*maxDim/w); w = maxDim; }
+        else if(h>w && h>maxDim){ w = Math.round(w*maxDim/h); h = maxDim; }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img,0,0,w,h);
+        let out = canvas.toDataURL('image/jpeg', quality);
+        // 압축 후에도 목표 용량을 넘으면 품질을 더 낮춰서 재시도 (최대 3회)
+        let q = quality;
+        let tries = 0;
+        while(dataUrlBytes(out) > TARGET_MAX_BYTES && tries < 3){
+          q = Math.max(0.4, q - 0.15);
+          out = canvas.toDataURL('image/jpeg', q);
+          tries++;
+        }
+        resolve(out);
+      };
+      img.onerror = ()=>reject(new Error('이미지를 불러오지 못했습니다.'));
+      img.src = e.target.result;
+    };
+    reader.onerror = ()=>reject(new Error('파일을 읽지 못했습니다.'));
+    reader.readAsDataURL(file);
+  });
+}
+
+function setImageStatus(msg, isError){
+  const el = document.getElementById('image-status');
+  if(!el) return;
+  el.textContent = msg;
+  el.style.color = isError ? 'var(--danger)' : 'var(--muted)';
+}
+
+async function addImageFiles(files){
+  const imageFiles = files.filter(f=>f.type && f.type.startsWith('image/'));
+  const tooBig = imageFiles.filter(f=>f.size > MAX_ORIGINAL_BYTES);
+  const room = MAX_IMAGES - attachedImages.length;
+  const overCount = imageFiles.length - tooBig.length > room;
+  const toProcess = imageFiles.filter(f=>f.size <= MAX_ORIGINAL_BYTES).slice(0, Math.max(room, 0));
+
+  if(toProcess.length === 0){
+    if(tooBig.length) setImageStatus(`원본이 20MB를 넘는 파일 ${tooBig.length}개는 건너뛰었어요.`, true);
+    else if(room <= 0) setImageStatus(`최대 ${MAX_IMAGES}장까지만 첨부할 수 있어요.`, true);
+    return;
+  }
+
+  setImageStatus(`${toProcess.length}장 압축 중...`, false);
+  let totalBytes = 0;
+  for(const file of toProcess){
+    try{
+      const dataUrl = await resizeImageFile(file);
+      totalBytes += dataUrlBytes(dataUrl);
+      attachedImages.push({ id: uid(), dataUrl });
+    }catch(e){ console.error(e); }
+  }
+  renderImageGallery();
+
+  const avgKB = Math.round(totalBytes / toProcess.length / 1024);
+  const parts = [`${toProcess.length}장 압축 완료 (평균 ${avgKB}KB)`];
+  if(tooBig.length) parts.push(`20MB 초과 ${tooBig.length}개 제외`);
+  if(overCount) parts.push(`최대 ${MAX_IMAGES}장 제한으로 일부 미첨부`);
+  setImageStatus(parts.join(' · '), false);
+}
+
+function renderImageGallery(){
+  const gal = document.getElementById('image-gallery');
+  gal.innerHTML = attachedImages.map((img,i)=>`
+    <div class="img-thumb" data-id="${img.id}">
+      <img src="${img.dataUrl}" alt="첨부 이미지 ${i+1}" />
+      <button class="rm" data-id="${img.id}" title="삭제" type="button">&times;</button>
+    </div>
+  `).join('');
+  gal.querySelectorAll('.rm').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const id = btn.dataset.id;
+      attachedImages = attachedImages.filter(x=>x.id!==id);
+      Object.keys(slideImageMap).forEach(k=>{ if(slideImageMap[k]===id) delete slideImageMap[k]; });
+      renderImageGallery();
+      setImageStatus(`${attachedImages.length}/${MAX_IMAGES}장 첨부됨`, false);
+      if(currentGenerated) renderPreview();
+    });
+  });
+}
+
+const dropzoneEl = document.getElementById('dropzone');
+const fileInputEl = document.getElementById('file-input');
+dropzoneEl.addEventListener('click', ()=>fileInputEl.click());
+fileInputEl.addEventListener('change', (e)=>{ addImageFiles(Array.from(e.target.files||[])); fileInputEl.value=''; });
+['dragenter','dragover'].forEach(ev=>{
+  dropzoneEl.addEventListener(ev, (e)=>{ e.preventDefault(); dropzoneEl.classList.add('drag'); });
+});
+['dragleave','drop'].forEach(ev=>{
+  dropzoneEl.addEventListener(ev, (e)=>{ e.preventDefault(); dropzoneEl.classList.remove('drag'); });
+});
+dropzoneEl.addEventListener('drop', (e)=>{
+  const files = Array.from(e.dataTransfer.files||[]);
+  addImageFiles(files);
+});
+window.addEventListener('paste', (e)=>{
+  const genActive = document.getElementById('panel-gen').classList.contains('active');
+  if(!genActive) return;
+  const items = Array.from(e.clipboardData ? e.clipboardData.items : []);
+  const files = items.filter(it=>it.type && it.type.startsWith('image/')).map(it=>it.getAsFile()).filter(Boolean);
+  if(files.length){ e.preventDefault(); addImageFiles(files); }
+});
+
+document.getElementById('btn-add-reflink').addEventListener('click', ()=>{
+  const input = document.getElementById('f-reflink');
+  const val = input.value.trim();
+  if(!val) return;
+  refLinks.push(val);
+  input.value = '';
+  renderRefLinks();
+});
+document.getElementById('f-reflink').addEventListener('keydown', (e)=>{
+  if(e.key === 'Enter'){ e.preventDefault(); document.getElementById('btn-add-reflink').click(); }
+});
+function renderRefLinks(){
+  const wrap = document.getElementById('reflink-list');
+  wrap.innerHTML = refLinks.map((link,i)=>`
+    <span class="reflink-chip">
+      <a href="${escapeHtml(link)}" target="_blank" rel="noopener">${escapeHtml(link)}</a>
+      <button class="rm" data-i="${i}" type="button">&times;</button>
+    </span>
+  `).join('');
+  wrap.querySelectorAll('.rm').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      refLinks.splice(Number(btn.dataset.i),1);
+      renderRefLinks();
+    });
+  });
+}
+
+function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+function todayStr(){ return new Date().toISOString().slice(0,10); }
+function fmtDate(d){ if(!d) return '-'; return d; }
+
+async function getArr(key){
+  try{
+    const r = await window.storage.get(key, true);
+    return r && r.value ? JSON.parse(r.value) : [];
+  }catch(e){ return []; }
+}
+async function saveArr(key, arr){
+  try{
+    await window.storage.set(key, JSON.stringify(arr), true);
+  }catch(e){ console.error('storage save failed', e); }
+}
+
+async function loadAll(){
+  state.cardnews = await getArr('cardnews:items');
+  state.outreach = await getArr('outreach:items');
+  state.contracts = await getArr('contracts:items');
+  renderHome();
+  renderLibrary();
+  renderDM();
+  renderContracts();
+}
+
+// ---------- nav ----------
+document.getElementById('btn-open-sb').addEventListener('click', ()=>{
+  const platform = document.getElementById('sb-platform').value;
+  const username = document.getElementById('sb-username').value.trim().replace(/^@/, '');
+  if(!username){ alert('아이디를 입력해주세요.'); return; }
+  window.open(`https://socialblade.com/${platform}/user/${encodeURIComponent(username)}`, '_blank');
+});
+document.getElementById('btn-open-ha').addEventListener('click', ()=>{
+  window.open('https://hypeauditor.com/free-tools/instagram-audit/', '_blank');
+});
+
+document.querySelectorAll('.navitem').forEach(el=>{
+  el.addEventListener('click', ()=>{
+    document.querySelectorAll('.navitem').forEach(n=>n.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('panel-'+el.dataset.tab).classList.add('active');
+  });
+});
+
+// ---------- generator ----------
+function renderTrackFields(){
+  const wrap = document.getElementById('track-fields');
+  if(currentTrack === 'A'){
+    wrap.innerHTML = `
+      <div class="field"><label>모집 직무</label>
+        <select id="f-role">
+          <option>통번역·환자유치</option>
+          <option>카드뉴스 제작</option>
+          <option>비자 상담 연계</option>
+        </select>
+      </div>`;
+  } else if(currentTrack === 'B'){
+    wrap.innerHTML = `
+      <div class="field"><label>대상 국가</label>
+        <select id="f-country">
+          <option>일본</option><option>대만</option><option>홍콩</option><option>영미권</option><option>CIS</option>
+        </select>
+      </div>
+      <div class="field"><label>인플루언서 유형</label>
+        <select id="f-influencer-type">
+          <option>뷰티·라이프스타일</option><option>연예인급</option><option>여행 크리에이터</option>
+        </select>
+      </div>`;
+  } else {
+    wrap.innerHTML = `
+      <div class="field"><label>업종</label>
+        <select id="f-industry">
+          <option>병원(피부과)</option><option>병원(성형외과)</option><option>식당</option><option>헤어메이크업</option>
+        </select>
+      </div>
+      <div class="field"><label>대상 국가 (선택)</label>
+        <select id="f-country2">
+          <option value="">지정 안 함</option>
+          <option>일본</option><option>대만</option><option>홍콩</option><option>영미권</option><option>CIS</option>
+        </select>
+      </div>`;
+  }
+}
+renderTrackFields();
+
+document.querySelectorAll('.track-btn').forEach(el=>{
+  el.addEventListener('click', ()=>{
+    document.querySelectorAll('.track-btn').forEach(b=>b.classList.remove('selected'));
+    el.classList.add('selected');
+    currentTrack = el.dataset.track;
+    renderTrackFields();
+  });
+});
+
+function getTrackGuidance(){
+  let trackRule = '';
+  let meta = { track: currentTrack };
+
+  if(currentTrack === 'A'){
+    const role = document.getElementById('f-role').value;
+    trackRule = `트랙 A — 국내거주 외국인 에이전트 모집
+목적: 한국 거주 외국인을 단순 채용 대상이 아니라, 병원·뷰티·관광·서비스를 자국어로 소개하고 고객을 연결할 수 있는 "글로벌 에이전트/파트너"로 모집합니다.
+핵심 방향: "돈 벌 수 있음"만 강조하지 말고, 유연한 활동·본인 언어 활용·한국에서의 커리어 확장·성과형 수익·외국인 네트워크 활용을 함께 보여주세요.
+타깃: 한국 거주 외국인, 유학생, 직장인, SNS 운영자, 커뮤니티 운영자, 통번역 경험자, 뷰티·의료 관심자.
+톤: 글로벌하고 세련되게, 지나치게 다단계·리크루팅처럼 보이지 않게, 정식 비즈니스 파트너 모집처럼.
+반드시 포함: 지원 대상, 주요 활동, 수익 방식, 활동 지역, 우대사항, 지원 방법.
+절대 피할 것: 과장된 고수익 보장, "누구나 월 000만원", 불법 환자유치처럼 오해될 표현, 저가형 채용광고 느낌.
+추천 콘텐츠 구조: Hook → 이런 사람에게 적합 → 무슨 일을 하는지 → 어떤 지원/혜택이 있는지 → CTA.
+모집 직무 참고: ${role}`;
+    meta.role = role;
+  } else if(currentTrack === 'B'){
+    const country = document.getElementById('f-country').value;
+    const itype = document.getElementById('f-influencer-type').value;
+    trackRule = `트랙 B — 해외 인플루언서·연예인 섭외
+목적: 해외 인플루언서·셀럽·크리에이터와 병원/브랜드/콘텐츠 협업을 만들기 위한 섭외 및 파트너 모집입니다.
+핵심 방향: "광고 한 번 해주세요"가 아니라, 한국 방문·K-Beauty·촬영·체험·브랜드 협업·장기 파트너십까지 확장 가능한 프로젝트처럼 보이게 하세요.
+타깃: 해외 TikTok·Instagram·YouTube 크리에이터, 현지 에이전시, 매니지먼트사, 연예인 매니저, MCN.
+톤: 프리미엄, 글로벌 에이전시, 엔터테인먼트 피치덱 느낌.
+반드시 포함: 협업 대상, 협업 유형, 제공 가능 항목, 원하는 크리에이터 유형, 진행 프로세스, 문의/제안 방식.
+절대 피할 것: 무조건 무료시술 강조, 저가 협찬 느낌, 팔로워 수만 보는 표현, 병원 광고 티가 너무 강한 구성.
+추천 콘텐츠 구조: Opportunity → Who we are looking for → Collaboration options → Benefits → Example content → Contact.
+대상 국가: ${country}. 인플루언서 유형: ${itype}. 국가별 정서에 맞게 현지화하세요.`;
+    meta.country = country; meta.influencerType = itype;
+  } else {
+    const industry = document.getElementById('f-industry').value;
+    const country2 = document.getElementById('f-country2').value;
+    trackRule = `트랙 C — 병원·식당·헤어메이크업 광고주 모집
+목적: 병원뿐 아니라 외국인 관광객·환자·크리에이터를 타깃으로 하는 식당, 카페, 헤어, 메이크업, 피부·뷰티·서비스 업체까지 광고주/제휴처로 확보합니다.
+핵심 방향: "광고 맡기세요"보다 외국인 고객을 실제로 데려올 수 있는 마케팅 파트너라는 점을 보여주세요.
+타깃: 외국인 고객 유치가 필요한 병원, 식당, 카페, 헤어샵, 메이크업샵, 뷰티샵, 관광·체험 업체.
+톤: B2B 제안서처럼 신뢰감 있게, 숫자·성과·채널·프로세스 중심.
+반드시 포함: 타깃 국가, 마케팅 채널, 콘텐츠 형태, 인플루언서 활용 여부, 유입 구조, 상담/문의 CTA.
+절대 피할 것: "바이럴 해드립니다" 같은 추상적 문구, 플랫폼 이름만 나열, 성과 보장성 표현.
+추천 콘텐츠 구조: 외국인 고객 시장 문제 → 우리가 연결하는 고객 → 실행 방식 → 콘텐츠/채널 → 기대효과 → 상담 CTA.
+대상 업종: ${industry}.` + (country2 ? ` 협찬 연결 가능 국가: ${country2}` : '');
+    meta.industry = industry; if(country2) meta.country = country2;
+  }
+  return { trackRule, meta };
+}
+
+function buildOutlinePrompt(){
+  const slideCount = document.getElementById('f-slides').value;
+  const brief = document.getElementById('f-brief').value.trim();
+  const { trackRule, meta } = getTrackGuidance();
+
+  const prompt = `당신은 카드뉴스 기획자입니다. 아래 지침에 맞는 카드뉴스의 슬라이드별 "기획안(아웃라인)"을 한국어로 작성하세요.
+이 단계는 실제 카피가 아니라, 담당자가 방향을 검토·수정할 수 있도록 각 슬라이드에 어떤 내용이 들어갈지 간단히 설명하는 단계입니다.
+
+${trackRule}
+
+${brief ? '추가 요청사항(추가·삭제·디자인 지시 포함 가능): ' + brief : ''}
+
+규칙:
+- 정확히 ${slideCount}개 슬라이드로 구성하세요.
+- 각 슬라이드는 위 추천 콘텐츠 구조의 단계 중 하나에 순서대로 대응해야 합니다.
+- 추가 요청사항에 특정 항목을 빼거나 더 강조하라는 지시가 있으면 그에 맞게 구조를 조정하세요.
+- 응답은 오직 JSON 객체 하나만 출력하세요. 코드블록이나 설명 문구는 절대 붙이지 마세요.
+- JSON 형식: {"slides":[{"role":"단계명(예: Hook)","note":"이 슬라이드에 어떤 내용이 들어갈지 1~2문장 한국어로 설명"}]}`;
+
+  return { prompt, meta };
+}
+
+function buildPrompt(outline){
+  const language = document.getElementById('f-language').value;
+  const slideCount = document.getElementById('f-slides').value;
+  const tone = document.getElementById('f-tone').value;
+  const brief = document.getElementById('f-brief').value.trim();
+
+  const languageNote = language === '한국어' ? '' : `
+- 절대 한국어 문장을 직역한 것처럼 쓰지 마세요. "${language}"를 모국어로 쓰는 사람이 이 업계 SNS 게시물을 볼 때 자연스럽게 읽히는 문장으로, 처음부터 그 언어로 생각해서 작성하세요.
+- 교과서적이거나 격식 있는 번역투 표현은 피하고, 해당 언어권 SNS·업계에서 실제로 쓰는 표현을 쓰세요.` + (tone === 'casual' ? `
+- 또래끼리 대화하듯 캐주얼한 구어체와, 해당 언어권에서 지금 실제로 쓰이는 유행어·인터넷 밈 표현을 적극 활용하세요. 딱딱한 존댓말투나 뉴스 문어체는 쓰지 마세요.` : '');
+
+  const base = `당신은 의료관광 에이전시의 SNS 카드뉴스 카피라이터입니다. 인스타그램·페이스북·틱톡에 슬라이드 형식으로 올릴 카드뉴스를 기획하세요.
+반드시 지켜야 할 규칙:
+- 회사명, 법인명, 특정 병원 실명을 절대 언급하지 마세요.
+- 협찬이나 제휴 문의는 "DM으로 문의해주세요" 식으로만 안내하세요.
+- 응답은 오직 하나의 JSON 객체만 출력하세요. 코드블록 표시나 설명 문구를 절대 붙이지 마세요.
+- JSON 형식: {"title":"...", "caption":"...", "slides":[{"headline":"...", "body":"..."}]}
+- caption은 게시물에 붙일 짧은 설명(2~3문장, 해시태그 3~5개 포함)입니다.
+- slides는 정확히 ${slideCount}개 작성하세요.
+- 첫 번째 슬라이드(slides[0])는 스크롤을 멈추게 하는 강력한 후킹 카피여야 합니다. 질문형, 반전, 숫자, 의외의 사실 등을 활용한 아주 짧고 임팩트 있는 헤드라인(공백 포함 20자 내외)으로 작성하고, body는 한 문장짜리 짧은 티저만 넣으세요.
+- 두 번째 슬라이드부터는 헤드라인을 15~22자 내외로 짧고 강렬하게 쓰고, body는 2문장 이내로 간결하게 작성하세요.
+- 느낌표 남발이나 과장된 이모지 없이, 단어 선택만으로 임팩트를 주세요.
+- 모든 텍스트는 "${language}"로 작성하세요.${languageNote}`;
+
+  const { trackRule, meta } = getTrackGuidance();
+  meta.language = language; meta.slideCount = slideCount; meta.tone = tone;
+
+  const outlineBlock = outline && outline.length ? `\n\n아래 승인된 기획안의 구조와 내용을 그대로 따라 슬라이드를 작성하세요. 각 항목은 슬라이드 순서와 1:1로 대응됩니다 (항목 개수만큼 슬라이드를 작성하세요):\n` + outline.map((o,i)=>`${i+1}. [${o.role}] ${o.note}`).join('\n') : '';
+
+  const full = base + '\n\n' + trackRule + (brief ? `\n\n추가 요청사항: ${brief}` : '') + outlineBlock + (refLinks.length ? `\n\n참고 링크(직접 열람은 불가하니 주제·톤 참고용으로만 감안하세요): ${refLinks.join(', ')}` : '') + (attachedImages.length ? `\n\n첨부된 이미지가 있습니다. 이미지 속 분위기, 장소, 시술 부위 등을 참고해서 카피에 반영하세요.` : '');
+  return { prompt: full, meta };
+}
+
+function showGenError(msg){
+  const box = document.getElementById('gen-error');
+  if(!msg){ box.style.display='none'; box.textContent=''; return; }
+  box.style.display='block';
+  box.textContent = msg;
+}
+
+async function callClaude(contentBlocks){
+  const settings = await getProxySettings();
+  const endpoint = settings.url || 'https://api.anthropic.com/v1/messages';
+  const headers = { 'Content-Type':'application/json' };
+  if(settings.url && settings.code) headers['x-team-code'] = settings.code;
+
+  const res = await fetch(endpoint, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 1000,
+      messages: [{ role:'user', content: contentBlocks }]
+    })
+  });
+  if(!res.ok) throw new Error('API 오류: ' + res.status);
+  const data = await res.json();
+  const text = (data.content || []).filter(b=>b.type==='text').map(b=>b.text).join('\n');
+  return text.replace(/```json/g,'').replace(/```/g,'').trim();
+}
+
+function apiErrorMessage(hasProxy){
+  return hasProxy
+    ? '요청에 실패했습니다. 프록시 서버 주소나 팀 코드가 올바른지 확인해주세요.'
+    : '요청에 실패했습니다. 이 화면은 Claude.ai 아티팩트로 열었을 때만 API가 동작해요 — 팀 전체가 쓰려면 위 "프록시 서버 설정"에 Worker 주소를 입력해주세요.';
+}
+
+let currentOutline = null;
+
+async function generateOutline(){
+  showGenError('');
+  const btn = document.getElementById('btn-generate-outline');
+  const regenBtn = document.getElementById('btn-regen-outline');
+  const activeBtn = document.getElementById('outline-box').style.display === 'none' ? btn : regenBtn;
+  activeBtn.disabled = true;
+  const origText = activeBtn.textContent;
+  activeBtn.textContent = '기획안 생성 중...';
+  try{
+    const { prompt } = buildOutlinePrompt();
+    const clean = await callClaude([{ type:'text', text: prompt }]);
+    const parsed = JSON.parse(clean);
+    if(!Array.isArray(parsed.slides) || !parsed.slides.length) throw new Error('형식 오류');
+    currentOutline = parsed.slides;
+    renderOutline();
+    document.getElementById('outline-box').style.display = 'block';
+    document.getElementById('preview-box').style.display = 'none';
+  }catch(e){
+    console.error(e);
+    showGenError(apiErrorMessage(!!(await getProxySettings()).url));
+  }finally{
+    activeBtn.disabled = false;
+    activeBtn.textContent = origText;
+  }
+}
+
+function renderOutline(){
+  const wrap = document.getElementById('outline-list');
+  wrap.innerHTML = currentOutline.map((s,i)=>`
+    <div class="field-row" style="align-items:flex-start;">
+      <div class="field" style="flex:0;min-width:110px;">
+        <label>${i+1}. 구조</label>
+        <input type="text" class="outline-role" data-idx="${i}" value="${escapeHtml(s.role||'')}" />
+      </div>
+      <div class="field" style="flex:1;">
+        <label>내용 설명 (수정 가능)</label>
+        <textarea class="outline-note" data-idx="${i}" style="min-height:44px;">${escapeHtml(s.note||'')}</textarea>
+      </div>
+    </div>
+  `).join('');
+  wrap.querySelectorAll('.outline-role').forEach(el=>{
+    el.addEventListener('input', ()=>{ currentOutline[el.dataset.idx].role = el.value; });
+  });
+  wrap.querySelectorAll('.outline-note').forEach(el=>{
+    el.addEventListener('input', ()=>{ currentOutline[el.dataset.idx].note = el.value; });
+  });
+}
+
+document.getElementById('btn-generate-outline').addEventListener('click', generateOutline);
+document.getElementById('btn-regen-outline').addEventListener('click', generateOutline);
+
+document.getElementById('btn-generate-from-outline').addEventListener('click', async ()=>{
+  showGenError('');
+  const btn = document.getElementById('btn-generate-from-outline');
+  btn.disabled = true;
+  btn.textContent = '생성 중...';
+  document.getElementById('preview-box').style.display = 'none';
+  try{
+    const { prompt, meta } = buildPrompt(currentOutline);
+    const contentBlocks = [];
+    attachedImages.slice(0,3).forEach(img=>{
+      const match = img.dataUrl.match(/^data:(.*?);base64,(.*)$/);
+      if(match){
+        contentBlocks.push({ type:'image', source:{ type:'base64', media_type: match[1], data: match[2] } });
+      }
+    });
+    contentBlocks.push({ type:'text', text: prompt });
+
+    const clean = await callClaude(contentBlocks);
+    const parsed = JSON.parse(clean);
+    if(!parsed.title || !Array.isArray(parsed.slides)) throw new Error('형식 오류');
+    currentGenerated = { ...parsed, meta, refLinks: refLinks.slice() };
+    if(attachedImages.length){
+      slideImageMap = {};
+      parsed.slides.forEach((_,i)=>{ if(attachedImages[i]) slideImageMap[i] = attachedImages[i].id; });
+    }
+    renderPreview();
+  }catch(e){
+    console.error(e);
+    showGenError(apiErrorMessage(!!(await getProxySettings()).url));
+  }finally{
+    btn.disabled = false;
+    btn.textContent = '이 기획안으로 카드뉴스 생성';
+  }
+});
+
+const PALETTES = {
+  A: [
+    { name:'딥틸', bg:'#1E3E42' },
+    { name:'네이비', bg:'#1B2A4A' },
+    { name:'포레스트', bg:'#234A2F' }
+  ],
+  B: [
+    { name:'브론즈골드', bg:'#6E551E' },
+    { name:'플럼', bg:'#4A2A52' }
+  ],
+  C: [
+    { name:'테라코타', bg:'#5C2C1F' },
+    { name:'카라멜', bg:'#6B4A1F' },
+    { name:'버건디', bg:'#5C1F30' }
+  ],
+  country: {
+    '일본': [
+      { name:'민트', bg:'#2F6B5E' },
+      { name:'사쿠라핑크', bg:'#7A3B52' },
+      { name:'라벤더', bg:'#4A3F6B' }
+    ],
+    '대만': [
+      { name:'레드골드', bg:'#7A2020' },
+      { name:'오렌지', bg:'#7A3D14' }
+    ],
+    '홍콩': [
+      { name:'네온마젠타', bg:'#6B1F4A' },
+      { name:'네온시안', bg:'#145C5C' }
+    ],
+    '영미권': [
+      { name:'핫핑크', bg:'#7A1F4A' },
+      { name:'일렉트릭블루', bg:'#1B3F6B' },
+      { name:'올리브라임', bg:'#4F5C2A' }
+    ],
+    'CIS': [
+      { name:'딥블루골드', bg:'#1B2F52' },
+      { name:'아이스틸', bg:'#1F4A52' }
+    ]
+  }
+};
+
+function pickPalette(track, country){
+  const pool = (country && PALETTES.country[country]) ? PALETTES.country[country] : PALETTES[track];
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+function buildSlideEl(track, headline, body, idx, total, isCover, imgDataUrl, bgColor){
+  const el = document.createElement('div');
+  el.className = 'vslide ' + TRACK_CLASS[track] + (isCover ? ' cover' : '') + (imgDataUrl ? ' has-img' : '');
+  if(bgColor) el.style.backgroundColor = bgColor;
+  const eyebrowText = { A:'AGENT RECRUIT', B:'PARTNER INVITE', C:'COLLAB PROPOSAL' }[track];
+  el.innerHTML = `
+    ${imgDataUrl ? `<img class="bgimg" src="${imgDataUrl}" alt="" />` : ''}
+    <div class="accentbar"></div>
+    <div class="eyebrow">${isCover ? eyebrowText : (idx+1)+' / '+total}</div>
+    <div class="headline">${escapeHtml(headline||'')}</div>
+    ${isCover ? '' : '<div class="rule"></div>'}
+    <div class="body">${escapeHtml(body||'')}</div>
+    <div class="pagepill">${String(idx+1).padStart(2,'0')}/${String(total).padStart(2,'0')}</div>
+  `;
+  return el;
+}
+
+async function downloadSlideImg(el, filename){
+  if(typeof html2canvas === 'undefined'){ alert('이미지 저장 기능을 불러오지 못했습니다. 새로고침 후 다시 시도해주세요.'); return; }
+  const canvas = await html2canvas(el, { scale: 3.6, backgroundColor: null, useCORS: true });
+  const link = document.createElement('a');
+  link.download = filename;
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+
+function renderVisualSlides(wrapEl, track, slides, filePrefix, images, imageMap, bgColor){
+  images = images || [];
+  imageMap = imageMap || {};
+  wrapEl.innerHTML = '';
+  slides.forEach((s, idx)=>{
+    const unit = document.createElement('div');
+    unit.className = 'slide-unit';
+
+    const imgId = imageMap[idx];
+    const imgObj = images.find(im=>im.id===imgId);
+    const slideEl = buildSlideEl(track, s.headline, s.body, idx, slides.length, idx===0, imgObj ? imgObj.dataUrl : null, bgColor);
+
+    let picker = null;
+    if(images.length){
+      picker = document.createElement('select');
+      picker.className = 'slide-imgpick';
+      picker.innerHTML = `<option value="">배경 이미지 없음</option>` + images.map((im,i)=>`<option value="${im.id}" ${im.id===imgId?'selected':''}>이미지 ${i+1}</option>`).join('');
+      picker.addEventListener('change', ()=>{
+        imageMap[idx] = picker.value || undefined;
+        if(!picker.value) delete imageMap[idx];
+        const newImgObj = images.find(im=>im.id===picker.value);
+        const newSlideEl = buildSlideEl(track, s.headline, s.body, idx, slides.length, idx===0, newImgObj ? newImgObj.dataUrl : null, bgColor);
+        unit.replaceChild(newSlideEl, unit.querySelector('.vslide'));
+        dlBtn.onclick = ()=>downloadSlideImg(unit.querySelector('.vslide'), `${filePrefix}_slide${idx+1}.png`);
+      });
+    }
+
+    const dlBtn = document.createElement('button');
+    dlBtn.className = 'slide-dl-btn';
+    dlBtn.textContent = '이미지 저장';
+    dlBtn.onclick = ()=>downloadSlideImg(unit.querySelector('.vslide'), `${filePrefix}_slide${idx+1}.png`);
+
+    if(picker) unit.appendChild(picker);
+    unit.appendChild(slideEl);
+    unit.appendChild(dlBtn);
+    wrapEl.appendChild(unit);
+  });
+}
+
+async function downloadAllSlides(wrapEl, filePrefix){
+  const slideEls = wrapEl.querySelectorAll('.vslide');
+  for(let i=0;i<slideEls.length;i++){
+    await downloadSlideImg(slideEls[i], `${filePrefix}_slide${i+1}.png`);
+    await new Promise(r=>setTimeout(r, 350));
+  }
+}
+
+function renderPreview(){
+  if(!currentGenerated) return;
+  document.getElementById('preview-box').style.display = 'block';
+  document.getElementById('preview-title').textContent = currentGenerated.title;
+  document.getElementById('preview-caption').textContent = currentGenerated.caption || '';
+  const slidesWrap = document.getElementById('preview-slides');
+  if(!currentGenerated.meta.paletteBg){
+    const p = pickPalette(currentGenerated.meta.track, currentGenerated.meta.country);
+    currentGenerated.meta.paletteBg = p.bg;
+    currentGenerated.meta.paletteName = p.name;
+  }
+  document.getElementById('preview-palette-tag').textContent = '톤앤매너: ' + currentGenerated.meta.paletteName;
+  renderVisualSlides(slidesWrap, currentGenerated.meta.track, currentGenerated.slides, 'cardnews', attachedImages, slideImageMap, currentGenerated.meta.paletteBg);
+}
+
+document.getElementById('btn-reroll-palette').addEventListener('click', ()=>{
+  if(!currentGenerated) return;
+  const p = pickPalette(currentGenerated.meta.track, currentGenerated.meta.country);
+  currentGenerated.meta.paletteBg = p.bg;
+  currentGenerated.meta.paletteName = p.name;
+  document.getElementById('preview-palette-tag').textContent = '톤앤매너: ' + p.name;
+  renderVisualSlides(document.getElementById('preview-slides'), currentGenerated.meta.track, currentGenerated.slides, 'cardnews', attachedImages, slideImageMap, p.bg);
+});
+
+document.getElementById('btn-download-all').addEventListener('click', ()=>{
+  downloadAllSlides(document.getElementById('preview-slides'), 'cardnews');
+});
+
+document.getElementById('btn-save-lib').addEventListener('click', async ()=>{
+  if(!currentGenerated) return;
+  const item = {
+    id: uid(),
+    track: currentGenerated.meta.track,
+    meta: currentGenerated.meta,
+    title: currentGenerated.title,
+    caption: currentGenerated.caption,
+    slides: currentGenerated.slides,
+    createdAt: new Date().toISOString(),
+    uploads: [],
+    refLinks: currentGenerated.refLinks || [],
+    hasImages: attachedImages.length > 0,
+    slideImageMap: { ...slideImageMap }
+  };
+  state.cardnews.unshift(item);
+  await saveArr('cardnews:items', state.cardnews);
+  if(attachedImages.length){
+    await saveArr('cardnews:img:' + item.id, attachedImages);
+  }
+  attachedImages = [];
+  slideImageMap = {};
+  refLinks = [];
+  renderImageGallery();
+  renderRefLinks();
+  renderLibrary();
+  renderHome();
+  document.querySelector('.navitem[data-tab="lib"]').click();
+});
+
+function escapeHtml(str){
+  const d = document.createElement('div');
+  d.textContent = str || '';
+  return d.innerHTML;
+}
+
+// ---------- library ----------
+function renderLibrary(){
+  const wrap = document.getElementById('lib-list');
+  const tf = document.getElementById('lib-filter-track').value;
+  const sf = document.getElementById('lib-filter-status').value;
+  let items = state.cardnews.slice();
+  if(tf) items = items.filter(i=>i.track===tf);
+  if(sf) items = items.filter(i=> (i.uploads.length>0 ? '업로드됨':'생성됨') === sf);
+
+  if(items.length===0){
+    wrap.innerHTML = `<div class="empty"><b>저장된 카드뉴스가 없습니다.</b>카드뉴스 생성 탭에서 새 콘텐츠를 만들어보세요.</div>`;
+    return;
+  }
+
+  wrap.innerHTML = items.map(item=>{
+    const status = item.uploads.length>0 ? '업로드됨' : '생성됨';
+    const statusClass = item.uploads.length>0 ? 'status-ok' : 'status-pending';
+    const metaLine = [
+      item.meta.country ? '국가: '+item.meta.country : null,
+      item.meta.industry ? '업종: '+item.meta.industry : null,
+      item.meta.role ? '직무: '+item.meta.role : null,
+      '언어: '+item.meta.language,
+      item.meta.paletteName ? '톤: '+item.meta.paletteName : null
+    ].filter(Boolean).join(' · ');
+    const uploadChips = item.uploads.map(u=>`<span class="upload-chip">${escapeHtml(u.platform)} · ${escapeHtml(u.account)}</span>`).join('');
+    const refChips = (item.refLinks||[]).map(l=>`<span class="reflink-chip"><a href="${escapeHtml(l)}" target="_blank" rel="noopener">${escapeHtml(l)}</a></span>`).join('');
+    return `
+    <div class="item-row" data-id="${item.id}">
+      <div class="item-top">
+        <span class="badge ${TRACK_CLASS[item.track]}">${TRACK_LABEL[item.track]}</span>
+        <span class="badge ${statusClass}">${status}</span>
+        <span class="item-title">${escapeHtml(item.title)}</span>
+      </div>
+      <div class="item-meta">${metaLine} · 생성일 ${new Date(item.createdAt).toLocaleDateString('ko-KR')}</div>
+      <div class="item-caption">${escapeHtml(item.caption||'')}</div>
+      ${refChips ? `<div style="margin-bottom:8px;">${refChips}</div>` : ''}
+      <div class="upload-list">${uploadChips}</div>
+      <div class="item-actions">
+        <button class="btn small secondary btn-toggle-images">이미지 보기·다운로드</button>
+        <button class="btn small secondary btn-toggle-upload">업로드 정보 추가</button>
+        <button class="btn small secondary btn-delete-item">삭제</button>
+      </div>
+      <div class="slide-grid" id="images-${item.id}" style="display:none;margin-top:12px;"></div>
+      <div class="upload-form" id="upload-form-${item.id}">
+        <div class="field-row">
+          <div class="field"><label>플랫폼</label><input type="text" class="up-platform" placeholder="Instagram 등" /></div>
+          <div class="field"><label>계정</label><input type="text" class="up-account" placeholder="서브계정 ID" /></div>
+          <div class="field"><label>게시 링크 (선택)</label><input type="text" class="up-link" /></div>
+        </div>
+        <div class="field-row">
+          <div class="field"><label>게시일</label><input type="date" class="up-date" value="${todayStr()}" /></div>
+          <div class="field"><label>작성자</label><input type="text" class="up-author" /></div>
+        </div>
+        <button class="btn small btn-confirm-upload">저장</button>
+      </div>
+    </div>`;
+  }).join('');
+
+  wrap.querySelectorAll('.btn-toggle-images').forEach(btn=>{
+    btn.addEventListener('click', async (e)=>{
+      const id = e.target.closest('.item-row').dataset.id;
+      const box = document.getElementById('images-'+id);
+      const isOpen = box.style.display !== 'none';
+      if(isOpen){ box.style.display = 'none'; return; }
+      const item = state.cardnews.find(i=>i.id===id);
+      if(!box.dataset.rendered){
+        btn.disabled = true;
+        const origText = btn.textContent;
+        btn.textContent = '불러오는 중...';
+        const images = item.hasImages ? await getArr('cardnews:img:' + id) : [];
+        renderVisualSlides(box, item.track, item.slides, 'cardnews_'+id.slice(0,5), images, item.slideImageMap || {}, item.meta.paletteBg);
+        box.dataset.rendered = '1';
+        btn.disabled = false;
+        btn.textContent = origText;
+      }
+      box.style.display = 'flex';
+    });
+  });
+  wrap.querySelectorAll('.btn-toggle-upload').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      const id = e.target.closest('.item-row').dataset.id;
+      document.getElementById('upload-form-'+id).classList.toggle('open');
+    });
+  });
+  wrap.querySelectorAll('.btn-delete-item').forEach(btn=>{
+    btn.addEventListener('click', async (e)=>{
+      const id = e.target.closest('.item-row').dataset.id;
+      const item = state.cardnews.find(i=>i.id===id);
+      state.cardnews = state.cardnews.filter(i=>i.id!==id);
+      await saveArr('cardnews:items', state.cardnews);
+      if(item && item.hasImages){
+        try{ await window.storage.delete('cardnews:img:' + id, true); }catch(err){}
+      }
+      renderLibrary(); renderHome();
+    });
+  });
+  wrap.querySelectorAll('.btn-confirm-upload').forEach(btn=>{
+    btn.addEventListener('click', async (e)=>{
+      const row = e.target.closest('.item-row');
+      const id = row.dataset.id;
+      const platform = row.querySelector('.up-platform').value.trim();
+      const account = row.querySelector('.up-account').value.trim();
+      const link = row.querySelector('.up-link').value.trim();
+      const date = row.querySelector('.up-date').value;
+      const author = row.querySelector('.up-author').value.trim();
+      if(!platform || !account){ alert('플랫폼과 계정은 필수입니다.'); return; }
+      const item = state.cardnews.find(i=>i.id===id);
+      item.uploads.push({ platform, account, link, date, author });
+      await saveArr('cardnews:items', state.cardnews);
+      renderLibrary(); renderHome();
+    });
+  });
+}
+document.getElementById('lib-filter-track').addEventListener('change', renderLibrary);
+document.getElementById('lib-filter-status').addEventListener('change', renderLibrary);
+
+// ---------- DM outreach ----------
+document.getElementById('btn-add-dm').addEventListener('click', ()=>{
+  document.getElementById('dm-add-form').classList.toggle('open');
+  document.getElementById('dm-date').value = todayStr();
+});
+document.getElementById('btn-cancel-dm').addEventListener('click', ()=>{
+  document.getElementById('dm-add-form').classList.remove('open');
+});
+document.getElementById('btn-save-dm').addEventListener('click', async ()=>{
+  const target = document.getElementById('dm-target').value.trim();
+  if(!target){ alert('대상 ID / 업체명을 입력해주세요.'); return; }
+  const entry = {
+    id: uid(),
+    track: document.getElementById('dm-track').value,
+    country: document.getElementById('dm-country').value,
+    platform: document.getElementById('dm-platform').value.trim(),
+    account: document.getElementById('dm-account').value.trim(),
+    target,
+    date: document.getElementById('dm-date').value || todayStr(),
+    msgType: document.getElementById('dm-msgtype').value,
+    status: '무응답',
+    owner: document.getElementById('dm-owner').value.trim(),
+    next: document.getElementById('dm-next').value.trim()
+  };
+  state.outreach.unshift(entry);
+  await saveArr('outreach:items', state.outreach);
+  document.getElementById('dm-add-form').classList.remove('open');
+  ['dm-platform','dm-account','dm-target','dm-owner','dm-next'].forEach(id=>document.getElementById(id).value='');
+  renderDM(); renderHome();
+});
+
+function renderDM(){
+  const wrap = document.getElementById('dm-table-wrap');
+  const tf = document.getElementById('dm-filter-track').value;
+  const sq = document.getElementById('dm-search').value.trim().toLowerCase();
+  let items = state.outreach.slice();
+  if(tf) items = items.filter(i=>i.track===tf);
+  if(sq) items = items.filter(i=>i.target.toLowerCase().includes(sq));
+
+  if(items.length===0){
+    wrap.innerHTML = `<div class="empty"><b>아웃리치 기록이 없습니다.</b>위 버튼으로 첫 DM 발송을 기록해보세요.</div>`;
+    return;
+  }
+
+  wrap.innerHTML = `<table><thead><tr>
+    <th>트랙</th><th>국가</th><th>플랫폼</th><th>서브계정</th><th>대상</th><th>발송일</th><th>유형</th><th>응답</th><th>담당</th><th>다음 액션</th><th></th>
+  </tr></thead><tbody>${items.map(i=>`
+    <tr data-id="${i.id}">
+      <td><span class="badge ${TRACK_CLASS[i.track]}">${i.track}</span></td>
+      <td>${escapeHtml(i.country)}</td>
+      <td>${escapeHtml(i.platform)}</td>
+      <td>${escapeHtml(i.account)}</td>
+      <td>${escapeHtml(i.target)}</td>
+      <td>${fmtDate(i.date)}</td>
+      <td>${escapeHtml(i.msgType)}</td>
+      <td>
+        <select class="dm-status">
+          ${['무응답','읽씹','답장','협의중','계약'].map(s=>`<option ${s===i.status?'selected':''}>${s}</option>`).join('')}
+        </select>
+      </td>
+      <td>${escapeHtml(i.owner)}</td>
+      <td>${escapeHtml(i.next)}</td>
+      <td><button class="btn small secondary dm-del">삭제</button></td>
+    </tr>`).join('')}</tbody></table>`;
+
+  wrap.querySelectorAll('.dm-status').forEach(sel=>{
+    sel.addEventListener('change', async (e)=>{
+      const id = e.target.closest('tr').dataset.id;
+      const item = state.outreach.find(x=>x.id===id);
+      item.status = e.target.value;
+      await saveArr('outreach:items', state.outreach);
+      renderHome();
+    });
+  });
+  wrap.querySelectorAll('.dm-del').forEach(btn=>{
+    btn.addEventListener('click', async (e)=>{
+      const id = e.target.closest('tr').dataset.id;
+      state.outreach = state.outreach.filter(x=>x.id!==id);
+      await saveArr('outreach:items', state.outreach);
+      renderDM(); renderHome();
+    });
+  });
+}
+document.getElementById('dm-filter-track').addEventListener('change', renderDM);
+document.getElementById('dm-search').addEventListener('input', renderDM);
+
+// ---------- contracts ----------
+document.getElementById('btn-add-ct').addEventListener('click', ()=>{
+  document.getElementById('ct-add-form').classList.toggle('open');
+  document.getElementById('ct-date').value = todayStr();
+});
+document.getElementById('btn-cancel-ct').addEventListener('click', ()=>{
+  document.getElementById('ct-add-form').classList.remove('open');
+});
+document.getElementById('btn-save-ct').addEventListener('click', async ()=>{
+  const name = document.getElementById('ct-name').value.trim();
+  if(!name){ alert('대상명을 입력해주세요.'); return; }
+  const entry = {
+    id: uid(),
+    track: document.getElementById('ct-track').value,
+    name,
+    country: document.getElementById('ct-country').value,
+    status: document.getElementById('ct-status').value,
+    date: document.getElementById('ct-date').value || todayStr(),
+    owner: document.getElementById('ct-owner').value.trim(),
+    note: document.getElementById('ct-note').value.trim()
+  };
+  state.contracts.unshift(entry);
+  await saveArr('contracts:items', state.contracts);
+  document.getElementById('ct-add-form').classList.remove('open');
+  ['ct-name','ct-owner','ct-note'].forEach(id=>document.getElementById(id).value='');
+  renderContracts(); renderHome();
+});
+
+function renderContracts(){
+  const wrap = document.getElementById('ct-table-wrap');
+  const tf = document.getElementById('ct-filter-track').value;
+  const sf = document.getElementById('ct-filter-status').value;
+  let items = state.contracts.slice();
+  if(tf) items = items.filter(i=>i.track===tf);
+  if(sf) items = items.filter(i=>i.status===sf);
+
+  if(items.length===0){
+    wrap.innerHTML = `<div class="empty"><b>등록된 계약 건이 없습니다.</b>위 버튼으로 진행 중인 협의를 기록해보세요.</div>`;
+    return;
+  }
+
+  wrap.innerHTML = `<table><thead><tr>
+    <th>트랙</th><th>대상명</th><th>국가</th><th>상태</th><th>일자</th><th>담당자</th><th>메모</th><th></th>
+  </tr></thead><tbody>${items.map(i=>`
+    <tr data-id="${i.id}">
+      <td><span class="badge ${TRACK_CLASS[i.track]}">${i.track}</span></td>
+      <td>${escapeHtml(i.name)}</td>
+      <td>${escapeHtml(i.country)}</td>
+      <td>
+        <select class="ct-status-sel">
+          ${['리스트업','제안','협의중','계약완료','보류','종료'].map(s=>`<option ${s===i.status?'selected':''}>${s}</option>`).join('')}
+        </select>
+      </td>
+      <td>${fmtDate(i.date)}</td>
+      <td>${escapeHtml(i.owner)}</td>
+      <td>${escapeHtml(i.note)}</td>
+      <td><button class="btn small secondary ct-del">삭제</button></td>
+    </tr>`).join('')}</tbody></table>`;
+
+  wrap.querySelectorAll('.ct-status-sel').forEach(sel=>{
+    sel.addEventListener('change', async (e)=>{
+      const id = e.target.closest('tr').dataset.id;
+      const item = state.contracts.find(x=>x.id===id);
+      item.status = e.target.value;
+      await saveArr('contracts:items', state.contracts);
+      renderHome();
+    });
+  });
+  wrap.querySelectorAll('.ct-del').forEach(btn=>{
+    btn.addEventListener('click', async (e)=>{
+      const id = e.target.closest('tr').dataset.id;
+      state.contracts = state.contracts.filter(x=>x.id!==id);
+      await saveArr('contracts:items', state.contracts);
+      renderContracts(); renderHome();
+    });
+  });
+}
+document.getElementById('ct-filter-track').addEventListener('change', renderContracts);
+document.getElementById('ct-filter-status').addEventListener('change', renderContracts);
+
+// ---------- home dashboard ----------
+function renderHome(){
+  const grid = document.getElementById('metric-grid');
+  const totalCards = state.cardnews.length;
+  const uploaded = state.cardnews.filter(i=>i.uploads.length>0).length;
+  const dmSent = state.outreach.length;
+  const responded = state.outreach.filter(i=>['답장','협의중','계약'].includes(i.status)).length;
+  const responseRate = dmSent>0 ? Math.round(responded/dmSent*100) : 0;
+  const contractsDone = state.contracts.filter(i=>i.status==='계약완료').length;
+
+  grid.innerHTML = `
+    <div class="metric"><div class="lbl">생성된 카드뉴스</div><div class="val">${totalCards}</div></div>
+    <div class="metric"><div class="lbl">업로드 완료</div><div class="val">${uploaded}</div></div>
+    <div class="metric"><div class="lbl">DM 발송</div><div class="val">${dmSent}</div></div>
+    <div class="metric"><div class="lbl">응답률</div><div class="val">${responseRate}%</div></div>
+    <div class="metric"><div class="lbl">계약 완료</div><div class="val">${contractsDone}</div></div>
+  `;
+
+  const recent = [];
+  state.cardnews.slice(0,3).forEach(i=>recent.push({ t:new Date(i.createdAt).getTime(), text:`[${TRACK_LABEL[i.track]}] 카드뉴스 "${i.title}" 생성됨` }));
+  state.outreach.slice(0,3).forEach(i=>recent.push({ t:new Date(i.date).getTime()||0, text:`[${TRACK_LABEL[i.track]}] ${i.target}에 DM 발송 (${i.status})` }));
+  state.contracts.slice(0,3).forEach(i=>recent.push({ t:new Date(i.date).getTime()||0, text:`[${TRACK_LABEL[i.track]}] ${i.name} 계약 상태: ${i.status}` }));
+  recent.sort((a,b)=>b.t-a.t);
+
+  const list = document.getElementById('recent-list');
+  if(recent.length===0){
+    list.innerHTML = `<div class="empty"><b>아직 활동 기록이 없습니다.</b>카드뉴스를 생성하거나 DM을 기록하면 여기에 표시됩니다.</div>`;
+  } else {
+    list.innerHTML = recent.slice(0,8).map(r=>`<div style="padding:8px 0;border-bottom:1px solid var(--border);font-size:12.5px;">${escapeHtml(r.text)}</div>`).join('');
+  }
+}
+
+const SB_PLATFORM_MAP = { Instagram:'instagram', TikTok:'tiktok', YouTube:'youtube' };
+
+async function renderLeadsQR(){
+  const wrap = document.getElementById('leads-qr-wrap');
+  const settings = await getProxySettings();
+  if(!settings.url){
+    wrap.innerHTML = `<div class="empty" style="padding:16px;">위에서 프록시 서버 URL을 먼저 저장해주세요.</div>`;
+    return;
+  }
+  const intakeUrl = settings.url.replace(/\/$/, '') + '/intake';
+  wrap.innerHTML = `
+    <img src="https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${encodeURIComponent(intakeUrl)}" width="140" height="140" style="border:1px solid var(--border);border-radius:8px;" alt="리드 입력 페이지 QR코드" />
+    <div style="flex:1;min-width:200px;">
+      <div class="hint" style="margin-bottom:8px;word-break:break-all;">${escapeHtml(intakeUrl)}</div>
+      <button class="btn small secondary" id="btn-open-intake" type="button">페이지 열기</button>
+    </div>
+  `;
+  document.getElementById('btn-open-intake').addEventListener('click', ()=> window.open(intakeUrl, '_blank'));
+}
+
+async function loadLeads(){
+  const status = document.getElementById('leads-status');
+  const wrap = document.getElementById('leads-table-wrap');
+  const settings = await getProxySettings();
+  if(!settings.url){
+    wrap.innerHTML = `<div class="empty"><b>프록시 서버가 설정되지 않았어요.</b>카드뉴스 생성 탭에서 먼저 설정해주세요.</div>`;
+    return;
+  }
+  status.textContent = '불러오는 중...';
+  try{
+    const res = await fetch(settings.url.replace(/\/$/, '') + '/api/leads', {
+      headers: { 'x-team-code': settings.code || '' }
+    });
+    if(!res.ok) throw new Error('요청 실패');
+    const data = await res.json();
+    const leads = data.leads || [];
+    status.textContent = `총 ${leads.length}건`;
+    if(leads.length === 0){
+      wrap.innerHTML = `<div class="empty"><b>아직 들어온 리드가 없어요.</b>QR코드를 배포해서 유입을 만들어보세요.</div>`;
+      return;
+    }
+    wrap.innerHTML = `<table><thead><tr>
+      <th>플랫폼</th><th>계정 아이디</th><th>닉네임</th><th>제출일시</th><th></th>
+    </tr></thead><tbody>${leads.map(l=>{
+      const sb = SB_PLATFORM_MAP[l.platform];
+      return `<tr>
+        <td>${escapeHtml(l.platform)}</td>
+        <td>@${escapeHtml(l.handle)}</td>
+        <td>${escapeHtml(l.nickname||'-')}</td>
+        <td>${new Date(l.submittedAt).toLocaleString('ko-KR')}</td>
+        <td>${sb ? `<button class="btn small secondary lead-sb-btn" data-platform="${sb}" data-handle="${escapeHtml(l.handle)}">지수 확인</button>` : '-'}</td>
+      </tr>`;
+    }).join('')}</tbody></table>`;
+    wrap.querySelectorAll('.lead-sb-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        window.open(`https://socialblade.com/${btn.dataset.platform}/user/${encodeURIComponent(btn.dataset.handle)}`, '_blank');
+      });
+    });
+  }catch(e){
+    console.error(e);
+    status.textContent = '';
+    wrap.innerHTML = `<div class="empty"><b>리스트를 불러오지 못했어요.</b>프록시 URL·팀 코드를 확인해주세요.</div>`;
+  }
+}
+
+document.getElementById('btn-refresh-leads').addEventListener('click', loadLeads);
+
+document.querySelector('.navitem[data-tab="leads"]').addEventListener('click', ()=>{
+  renderLeadsQR();
+  loadLeads();
+});
+document.getElementById('brand-home').addEventListener('click', ()=>{
+  document.querySelector('.navitem[data-tab="leads"]').click();
+});
+
+async function loadOpenChat(){
+  try{
+    const r = await window.storage.get('settings:openchat', true);
+    const url = r && r.value ? JSON.parse(r.value).url : '';
+    document.getElementById('openchat-url').value = url || '';
+    renderOpenChat(url);
+  }catch(e){ /* no saved link yet */ }
+}
+function renderOpenChat(url){
+  const display = document.getElementById('openchat-display');
+  if(!url){ display.style.display = 'none'; return; }
+  display.style.display = 'block';
+  document.getElementById('openchat-qr').src = 'https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=' + encodeURIComponent(url);
+  document.getElementById('btn-open-openchat').onclick = ()=> window.open(url, '_blank');
+}
+document.getElementById('btn-save-openchat').addEventListener('click', async ()=>{
+  const url = document.getElementById('openchat-url').value.trim();
+  if(!url){ alert('오픈채팅방 링크를 입력해주세요.'); return; }
+  try{ await window.storage.set('settings:openchat', JSON.stringify({ url }), true); }catch(e){}
+  renderOpenChat(url);
+});
+loadOpenChat();
+
+loadAll();
+</script>
+</body>
+</html>
