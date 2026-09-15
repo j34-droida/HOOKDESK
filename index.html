@@ -21,6 +21,12 @@
     --track-b-bg:#F3EBDA;
     --track-c:#9C5B42;
     --track-c-bg:#F3E3DC;
+    --track-d:#5B4B8A;
+    --track-d-bg:#EAE5F3;
+    --track-e:#2F6B62;
+    --track-e-bg:#E2F0EC;
+    --track-f:#A24E76;
+    --track-f-bg:#F5E3ED;
     --danger:#A23B3B;
     --danger-bg:#F5E4E4;
     --ok:#3C6E71;
@@ -114,9 +120,17 @@
   .track-btn.a.selected{ border-color:var(--track-a); background:var(--track-a-bg); }
   .track-btn.b.selected{ border-color:var(--track-b); background:var(--track-b-bg); }
   .track-btn.c.selected{ border-color:var(--track-c); background:var(--track-c-bg); }
+  .track-btn.d.selected{ border-color:var(--track-d); background:var(--track-d-bg); }
+  .track-btn.e.selected{ border-color:var(--track-e); background:var(--track-e-bg); }
+  .track-btn.f.selected{ border-color:var(--track-f); background:var(--track-f-bg); }
   .track-btn.a b{ color:var(--track-a); }
   .track-btn.b b{ color:var(--track-b); }
   .track-btn.c b{ color:var(--track-c); }
+  .track-btn.d b{ color:var(--track-d); }
+  .track-btn.e b{ color:var(--track-e); }
+  .track-btn.f b{ color:var(--track-f); }
+  .track-btn.format-btn.selected{ border-color:var(--navy); background:var(--ivory); }
+  .track-btn.format-btn.selected b{ color:var(--navy); }
 
   .field-row{ display:flex; gap:12px; flex-wrap:wrap; margin-bottom:12px; }
   .field{ display:flex; flex-direction:column; gap:5px; flex:1; min-width:150px; }
@@ -153,6 +167,9 @@
   .badge.a{ background:var(--track-a-bg); color:var(--track-a); }
   .badge.b{ background:var(--track-b-bg); color:var(--track-b); }
   .badge.c{ background:var(--track-c-bg); color:var(--track-c); }
+  .badge.d{ background:var(--track-d-bg); color:var(--track-d); }
+  .badge.e{ background:var(--track-e-bg); color:var(--track-e); }
+  .badge.f{ background:var(--track-f-bg); color:var(--track-f); }
   .badge.status-ok{ background:var(--ok-bg); color:var(--ok); }
   .badge.status-pending{ background:#F3EBDA; color:var(--gold-deep); }
   .badge.status-muted{ background:#EFEDE7; color:var(--muted); }
@@ -176,6 +193,9 @@
   .vslide.a{ background:#1E3E42; }
   .vslide.b{ background:#6E551E; }
   .vslide.c{ background:#5C2C1F; }
+  .vslide.d{ background:#3E2F5C; }
+  .vslide.e{ background:#1F4A42; }
+  .vslide.f{ background:#5C2A48; }
   .vslide[style*="background-color"]{ }
   .palette-tag{ font-size:11px; color:var(--muted); margin-bottom:6px; }
   .vslide .accentbar{ position:absolute; top:0; left:0; right:0; height:6px; background:var(--gold); }
@@ -270,6 +290,11 @@
   .upload-list{ margin-top:8px; }
   .upload-chip{ display:inline-flex; align-items:center; gap:6px; font-size:11.5px; background:var(--ok-bg); color:var(--ok); padding:4px 9px; border-radius:14px; margin:3px 4px 0 0; }
 
+  .sf-block{ border:1px solid var(--border); border-radius:9px; padding:12px 14px; margin-bottom:10px; background:#fff; }
+  .sf-block-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:6px; }
+  .sf-block-label{ font-size:12px; font-weight:700; color:var(--navy); text-transform:uppercase; letter-spacing:0.3px; }
+  .sf-block-body{ font-size:13px; color:var(--charcoal); line-height:1.6; white-space:pre-wrap; word-break:keep-all; }
+
   .add-form{ display:none; margin-bottom:16px; }
   .add-form.open{ display:block; }
 
@@ -323,7 +348,7 @@
     <div class="panel active" id="panel-home">
       <div class="pagehead">
         <h1>대시보드</h1>
-        <p>트랙 A·B·C 운영 현황을 한눈에 확인합니다.</p>
+        <p>트랙 A·B·C 운영 현황과 트랙 D·E·F 콘텐츠 현황을 한눈에 확인합니다.</p>
       </div>
       <div class="metric-grid" id="metric-grid"></div>
       <div class="cardbox">
@@ -351,18 +376,30 @@
       </div>
 
       <div class="cardbox">
-        <h3>1. 트랙 선택</h3>
+        <h3 id="step-track-label">1. 트랙 선택</h3>
         <div class="track-select">
           <div class="track-btn a selected" data-track="A"><b>트랙 A</b>국내거주 외국인 에이전트 모집</div>
           <div class="track-btn b" data-track="B"><b>트랙 B</b>해외 인플루언서·연예인 섭외</div>
           <div class="track-btn c" data-track="C"><b>트랙 C</b>병원·식당·헤어메이크업 광고주 모집</div>
+          <div class="track-btn d" data-track="D"><b>트랙 D</b>Korean Dating Signals 콘텐츠</div>
+          <div class="track-btn e" data-track="E"><b>트랙 E</b>Korean Word Nuance 콘텐츠</div>
+          <div class="track-btn f" data-track="F"><b>트랙 F</b>K-Personality &amp; Beauty Mood 콘텐츠</div>
         </div>
 
-        <h3>2. 세부 정보</h3>
+        <div id="format-select-box" style="display:none;">
+          <h3 id="step-format-label">2. 콘텐츠 형식</h3>
+          <div class="track-select" id="format-select">
+            <div class="track-btn format-btn selected" data-format="cardnews"><b>카드뉴스</b>슬라이드 이미지로 저장 (인스타·틱톡 캐러셀)</div>
+            <div class="track-btn format-btn" data-format="shortform"><b>텍스트 블록</b>Title·Hook·Script·Caption·Hashtags 섹션 텍스트로 저장</div>
+          </div>
+          <div class="hint" style="margin-bottom:10px;">두 형식 모두 같은 세부 정보로 언제든 바꿔서 다시 생성할 수 있어요.</div>
+        </div>
+
+        <h3 id="step-details-label">2. 세부 정보</h3>
         <div class="field-row" id="track-fields"></div>
 
         <div class="field-row">
-          <div class="field">
+          <div class="field" id="abc-language-field">
             <label>출력 언어</label>
             <select id="f-language">
               <option value="한국어">한국어</option>
@@ -372,7 +409,16 @@
               <option value="러시아어">러시아어</option>
             </select>
           </div>
-          <div class="field">
+          <div class="field" id="def-language-field" style="display:none;">
+            <label>출력 언어</label>
+            <select id="f-language-def">
+              <option value="Taiwan">Taiwan</option>
+              <option value="Japan">Japan</option>
+              <option value="North America" selected>North America</option>
+              <option value="Russia">Russia</option>
+            </select>
+          </div>
+          <div class="field" id="slides-field">
             <label>슬라이드 수</label>
             <select id="f-slides">
               <option value="4">4장</option>
@@ -397,7 +443,7 @@
           </div>
         </div>
 
-        <h3 style="margin-top:18px;">3. 레퍼런스 링크 (선택)</h3>
+        <h3 id="step-reflink-label" style="margin-top:18px;">3. 레퍼런스 링크 (선택)</h3>
         <div class="hint" style="margin-bottom:8px;">참고할 페이지나 자료 링크를 붙여넣으면 톤 참고용으로 함께 저장됩니다.</div>
         <div class="field-row">
           <div class="field" style="flex:1;"><input type="text" id="f-reflink" placeholder="https://..." /></div>
@@ -405,12 +451,14 @@
         </div>
         <div id="reflink-list"></div>
 
-        <h3 style="margin-top:18px;">4. 이미지 첨부 (선택)</h3>
-        <div class="hint" style="margin-bottom:8px;">드래그해서 놓거나, 이미지를 복사해서 붙여넣기(Ctrl+V)하세요. 슬라이드 배경으로 사용하거나 카피 생성 시 참고 이미지로 활용됩니다.<br/>최대 <b>10장</b>, 장당 원본 <b>20MB</b>까지 — 올리면 자동으로 압축해서 평균 100~300KB로 줄여줘요. 용량 걱정 없이 그냥 올리시면 됩니다.</div>
-        <div class="dropzone" id="dropzone" tabindex="0">이미지를 여기에 드래그하거나 클릭해서 선택 · 붙여넣기(Ctrl+V) 가능</div>
-        <input type="file" id="file-input" accept="image/*" multiple style="display:none;" />
-        <div class="image-gallery" id="image-gallery"></div>
-        <div class="hint" id="image-status"></div>
+        <div id="image-attach-block">
+          <h3 id="step-image-label" style="margin-top:18px;">4. 이미지 첨부 (선택)</h3>
+          <div class="hint" style="margin-bottom:8px;">드래그해서 놓거나, 이미지를 복사해서 붙여넣기(Ctrl+V)하세요. 슬라이드 배경으로 사용하거나 카피 생성 시 참고 이미지로 활용됩니다.<br/>최대 <b>10장</b>, 장당 원본 <b>20MB</b>까지 — 올리면 자동으로 압축해서 평균 100~300KB로 줄여줘요. 용량 걱정 없이 그냥 올리시면 됩니다.</div>
+          <div class="dropzone" id="dropzone" tabindex="0">이미지를 여기에 드래그하거나 클릭해서 선택 · 붙여넣기(Ctrl+V) 가능</div>
+          <input type="file" id="file-input" accept="image/*" multiple style="display:none;" />
+          <div class="image-gallery" id="image-gallery"></div>
+          <div class="hint" id="image-status"></div>
+        </div>
 
         <button class="btn" id="btn-generate-outline" style="margin-top:6px;">기획안 미리보기 생성</button>
       </div>
@@ -440,6 +488,15 @@
           <button class="btn secondary" id="btn-download-all">전체 이미지 다운로드</button>
         </div>
       </div>
+
+      <div class="cardbox" id="shortform-preview-box" style="display:none;">
+        <h3>숏폼 초안</h3>
+        <div class="hint" style="margin-bottom:10px;">각 섹션의 "복사" 버튼으로 대본·편집 도구에 바로 붙여넣을 수 있어요.</div>
+        <div id="shortform-sections"></div>
+        <div style="margin-top:16px;display:flex;gap:10px;">
+          <button class="btn" id="btn-save-lib-shortform">라이브러리에 저장</button>
+        </div>
+      </div>
     </div>
 
     <div class="panel" id="panel-lib">
@@ -453,6 +510,9 @@
           <option value="A">트랙 A</option>
           <option value="B">트랙 B</option>
           <option value="C">트랙 C</option>
+          <option value="D">트랙 D</option>
+          <option value="E">트랙 E</option>
+          <option value="F">트랙 F</option>
         </select>
         <select id="lib-filter-status">
           <option value="">전체 상태</option>
@@ -490,14 +550,14 @@
       </div>
 
       <div class="toolbar">
-        <select id="dm-filter-track"><option value="">전체 트랙</option><option value="A">트랙 A</option><option value="B">트랙 B</option><option value="C">트랙 C</option></select>
+        <select id="dm-filter-track"><option value="">전체 트랙</option><option value="A">트랙 A</option><option value="B">트랙 B</option><option value="C">트랙 C</option><option value="D">트랙 D</option><option value="E">트랙 E</option><option value="F">트랙 F</option></select>
         <input type="text" id="dm-search" placeholder="대상 ID / 업체명 검색" />
         <div class="spacer"></div>
         <button class="btn small" id="btn-add-dm">+ 새 항목 추가</button>
       </div>
       <div class="add-form cardbox" id="dm-add-form">
         <div class="field-row">
-          <div class="field"><label>트랙</label><select id="dm-track"><option value="A">A</option><option value="B">B</option><option value="C">C</option></select></div>
+          <div class="field"><label>트랙</label><select id="dm-track"><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option></select></div>
           <div class="field"><label>국가</label><select id="dm-country"><option>국내</option><option>일본</option><option>대만</option><option>홍콩</option><option>영미권</option><option>CIS</option></select></div>
           <div class="field"><label>플랫폼</label><input type="text" id="dm-platform" placeholder="Instagram / LINE 등" /></div>
         </div>
@@ -523,7 +583,7 @@
         <p>광고주·인플루언서·에이전트와의 계약 진행 단계를 관리합니다.</p>
       </div>
       <div class="toolbar">
-        <select id="ct-filter-track"><option value="">전체 트랙</option><option value="A">트랙 A</option><option value="B">트랙 B</option><option value="C">트랙 C</option></select>
+        <select id="ct-filter-track"><option value="">전체 트랙</option><option value="A">트랙 A</option><option value="B">트랙 B</option><option value="C">트랙 C</option><option value="D">트랙 D</option><option value="E">트랙 E</option><option value="F">트랙 F</option></select>
         <select id="ct-filter-status">
           <option value="">전체 상태</option>
           <option>리스트업</option><option>제안</option><option>협의중</option><option>계약완료</option><option>보류</option><option>종료</option>
@@ -533,7 +593,7 @@
       </div>
       <div class="add-form cardbox" id="ct-add-form">
         <div class="field-row">
-          <div class="field"><label>트랙</label><select id="ct-track"><option value="A">A</option><option value="B">B</option><option value="C">C</option></select></div>
+          <div class="field"><label>트랙</label><select id="ct-track"><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option></select></div>
           <div class="field"><label>대상명</label><input type="text" id="ct-name" placeholder="업체명 / 인플루언서명" /></div>
           <div class="field"><label>국가</label><select id="ct-country"><option>국내</option><option>일본</option><option>대만</option><option>홍콩</option><option>영미권</option><option>CIS</option></select></div>
         </div>
@@ -614,12 +674,23 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
-const TRACK_LABEL = { A:'트랙 A', B:'트랙 B', C:'트랙 C' };
-const TRACK_CLASS = { A:'a', B:'b', C:'c' };
+const TRACK_LABEL = { A:'트랙 A', B:'트랙 B', C:'트랙 C', D:'트랙 D', E:'트랙 E', F:'트랙 F' };
+const TRACK_CLASS = { A:'a', B:'b', C:'c', D:'d', E:'e', F:'f' };
+const DEF_TRACKS = ['D','E','F'];
+function isDefTrack(t){ return DEF_TRACKS.includes(t); }
+
+const DEF_LANGUAGES = {
+  'Taiwan': { code:'zh-TW', name:'Traditional Chinese as used in Taiwan', tone:'friendly, soft, slightly cute, natural for social media' },
+  'Japan': { code:'ja-JP', name:'Japanese', tone:'polite but TikTok-friendly, cute, conversational, not too formal' },
+  'North America': { code:'en-US', name:'natural North American English (not textbook English)', tone:'TikTok-native, witty, warm, flirty but safe, easy to understand' },
+  'Russia': { code:'ru-RU', name:'Russian', tone:'clear, warm, slightly playful, social-media friendly' }
+};
 
 let state = { cardnews: [], outreach: [], contracts: [] };
 let currentTrack = 'A';
+let currentFormat = 'cardnews';
 let currentGenerated = null;
+let currentOutline = null;
 let attachedImages = [];
 
 // window.storage만 Claude.ai 아티팩트 안에서 작동. 로컬 파일로 열면 없기 때문에
@@ -869,6 +940,62 @@ document.querySelectorAll('.navitem').forEach(el=>{
 });
 
 // ---------- generator ----------
+const TOPIC_SAMPLES = {
+  D: [
+    '5 Moments Korean Guys Secretly Find Attractive',
+    'Signs a Korean Guy Is Interested in You',
+    'Why Korean Men Ask "Did You Eat?"',
+    'Korean Texting Style When He Likes You',
+    'Korean Dating Green Flags',
+    'Korean Dating Red Flags',
+    'K-drama Boyfriend vs Real Korean Boyfriend',
+    'What Korean Guys Notice on a First Date',
+    'Things Foreigners Do That Korean Guys Find Cute',
+    'What "편하게 지내자" Might Mean'
+  ],
+  E: [
+    '됐어요', '괜찮아요', '아니에요', '몰라요', '다음에요',
+    '생각해볼게요', '밥 먹었어?', '편하게 지내자', '한국식 간접 거절 표현', '공손하지만 차갑게 들릴 수 있는 표현'
+  ],
+  F: [
+    'MBTI + Blood Type: Who Has the Softest Heart?',
+    'Korean Dating Style by MBTI',
+    'Which MBTI Gets Jealous the Most?',
+    'Blood Type Dating Style in Korea',
+    'Korean First Date Outfit Ideas',
+    'Makeup Korean Guys Secretly Like',
+    'Hairstyles That Give K-drama Girlfriend Energy',
+    'Korean Soft Girl Beauty Look',
+    'Date Look Korean Men Notice',
+    'K-beauty Mood Ranking by Personality Type'
+  ]
+};
+const CUSTOM_TOPIC_VALUE = '__custom__';
+
+function topicFieldHtml(track, label){
+  const options = TOPIC_SAMPLES[track].map(t=>`<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join('');
+  return `
+    <div class="field" style="flex:2;"><label>${label}</label>
+      <select id="f-topic-${track.toLowerCase()}">
+        ${options}
+        <option value="${CUSTOM_TOPIC_VALUE}">직접 입력...</option>
+      </select>
+    </div>
+    <div class="field" id="f-topic-${track.toLowerCase()}-custom-wrap" style="display:none;flex:2;">
+      <label>직접 입력한 주제</label>
+      <input type="text" id="f-topic-${track.toLowerCase()}-custom" placeholder="다루고 싶은 주제나 한국어 표현을 입력하세요" />
+    </div>`;
+}
+function wireTopicCustomToggle(track){
+  const t = track.toLowerCase();
+  const sel = document.getElementById('f-topic-'+t);
+  const wrap = document.getElementById('f-topic-'+t+'-custom-wrap');
+  if(!sel || !wrap) return;
+  sel.addEventListener('change', ()=>{
+    wrap.style.display = sel.value === CUSTOM_TOPIC_VALUE ? 'block' : 'none';
+  });
+}
+
 function renderTrackFields(){
   const wrap = document.getElementById('track-fields');
   if(currentTrack === 'A'){
@@ -892,7 +1019,7 @@ function renderTrackFields(){
           <option>뷰티·라이프스타일</option><option>연예인급</option><option>여행 크리에이터</option>
         </select>
       </div>`;
-  } else {
+  } else if(currentTrack === 'C'){
     wrap.innerHTML = `
       <div class="field"><label>업종</label>
         <select id="f-industry">
@@ -905,18 +1032,87 @@ function renderTrackFields(){
           <option>일본</option><option>대만</option><option>홍콩</option><option>영미권</option><option>CIS</option>
         </select>
       </div>`;
+  } else if(currentTrack === 'D'){
+    wrap.innerHTML = topicFieldHtml('D', '다룰 데이팅 시그널 주제');
+    wireTopicCustomToggle('D');
+  } else if(currentTrack === 'E'){
+    wrap.innerHTML = topicFieldHtml('E', '다룰 한국어 표현/주제');
+    wireTopicCustomToggle('E');
+  } else if(currentTrack === 'F'){
+    wrap.innerHTML = topicFieldHtml('F', '다룰 성격·뷰티 주제');
+    wireTopicCustomToggle('F');
   }
 }
 renderTrackFields();
 
-document.querySelectorAll('.track-btn').forEach(el=>{
+function selectedTopicOf(track){
+  const t = track.toLowerCase();
+  const sel = document.getElementById('f-topic-'+t);
+  if(!sel) return '';
+  if(sel.value === CUSTOM_TOPIC_VALUE){
+    const custom = document.getElementById('f-topic-'+t+'-custom');
+    return custom ? custom.value.trim() : '';
+  }
+  return sel.value;
+}
+
+function syncFormatButtons(){
+  document.querySelectorAll('.format-btn').forEach(b=>b.classList.toggle('selected', b.dataset.format===currentFormat));
+}
+
+function applyTrackGroupVisibility(){
+  const def = isDefTrack(currentTrack);
+  document.getElementById('format-select-box').style.display = def ? 'block' : 'none';
+  if(!def){ currentFormat = 'cardnews'; }
+  syncFormatButtons();
+
+  document.getElementById('abc-language-field').style.display = def ? 'none' : 'flex';
+  document.getElementById('def-language-field').style.display = def ? 'flex' : 'none';
+
+  const isShortform = def && currentFormat === 'shortform';
+  document.getElementById('image-attach-block').style.display = isShortform ? 'none' : 'block';
+  document.getElementById('slides-field').style.display = isShortform ? 'none' : 'flex';
+
+  document.getElementById('step-details-label').textContent = (def ? '3' : '2') + '. 세부 정보';
+  document.getElementById('step-reflink-label').textContent = (def ? '4' : '3') + '. 레퍼런스 링크 (선택)';
+  document.getElementById('step-image-label').textContent = (def ? '5' : '4') + '. 이미지 첨부 (선택)';
+  document.getElementById('btn-generate-outline').textContent = isShortform ? '숏폼 초안 생성' : '기획안 미리보기 생성';
+  document.getElementById('btn-generate-from-outline').textContent = isShortform ? '이 기획안으로 숏폼 생성' : '이 기획안으로 카드뉴스 생성';
+
+  document.getElementById('preview-box').style.display = 'none';
+  document.getElementById('shortform-preview-box').style.display = 'none';
+  document.getElementById('outline-box').style.display = 'none';
+  currentGenerated = null;
+  currentOutline = null;
+}
+
+document.querySelectorAll('.track-btn[data-track]').forEach(el=>{
   el.addEventListener('click', ()=>{
-    document.querySelectorAll('.track-btn').forEach(b=>b.classList.remove('selected'));
+    document.querySelectorAll('.track-btn[data-track]').forEach(b=>b.classList.remove('selected'));
     el.classList.add('selected');
     currentTrack = el.dataset.track;
     renderTrackFields();
+    applyTrackGroupVisibility();
   });
 });
+
+document.querySelectorAll('.format-btn').forEach(el=>{
+  el.addEventListener('click', ()=>{
+    currentFormat = el.dataset.format;
+    applyTrackGroupVisibility();
+  });
+});
+
+applyTrackGroupVisibility();
+
+const DEF_GLOBAL_RULES = `공통 규칙 (트랙 D/E/F 전용, K-컬처 숏폼 콘텐츠):
+- 타깃: K-drama·K-pop·K-beauty·한국 연애문화에 관심 있는 외국인 여성 시청자 (대만/일본/북미/러시아 등), TikTok/Reels/Shorts에서 짧은 영상으로 소비됨.
+- 절대 금지 표현: "all Korean men", "Koreans always", "every Korean guy", "foreign girls are like this", "guaranteed", 실제 과학적 근거가 없는데 "scientifically proven"이라고 쓰는 것, 노골적으로 성적인 표현, 조롱하거나 비하하는 문화 비교.
+- 반드시 이런 완곡한(hedged) 표현을 우선 사용: "many Korean guys", "some people", "often", "sometimes", "might", "in Korean dating culture", "not every person, of course", "just for fun", "Korean cafe talk".
+- 한국어 단어·표현은 절대 다른 언어로 번역하지 말고 원문 한글 그대로 표기한 뒤, 바로 옆에 선택된 언어로 쉬운 뜻과 뉘앙스를 설명할 것.
+- 톤: 재미있고 귀엽고 살짝 플러팅한(flirty) 느낌, 정보성이 있지만 절대 딱딱하거나 강의하듯 쓰지 않기. 첫 1~2초 안에 시선을 붙잡는 강력한 훅이 핵심.
+- 이 콘텐츠는 영업/광고 자료가 아니라 TikTok/Reels/Shorts용 엔터테인먼트 콘텐츠임 — 회사·상품·서비스를 파는 듯한 문구, 세일즈 CTA, 상담/문의 유도 문구를 절대 쓰지 말 것. 대신 댓글·저장·공유를 유도하는 문구를 쓸 것.
+- 문장은 짧고 리듬감 있게, 바로 촬영/게시에 쓸 수 있을 만큼 구체적으로 작성할 것. 특정 실존 인물이나 연예인 실명은 언급하지 말 것.`;
 
 function getTrackGuidance(){
   let trackRule = '';
@@ -947,7 +1143,7 @@ function getTrackGuidance(){
 추천 콘텐츠 구조: Opportunity → Who we are looking for → Collaboration options → Benefits → Example content → Contact.
 대상 국가: ${country}. 인플루언서 유형: ${itype}. 국가별 정서에 맞게 현지화하세요.`;
     meta.country = country; meta.influencerType = itype;
-  } else {
+  } else if(currentTrack === 'C'){
     const industry = document.getElementById('f-industry').value;
     const country2 = document.getElementById('f-country2').value;
     trackRule = `트랙 C — 병원·식당·헤어메이크업 광고주 모집
@@ -960,44 +1156,114 @@ function getTrackGuidance(){
 추천 콘텐츠 구조: 외국인 고객 시장 문제 → 우리가 연결하는 고객 → 실행 방식 → 콘텐츠/채널 → 기대효과 → 상담 CTA.
 대상 업종: ${industry}.` + (country2 ? ` 협찬 연결 가능 국가: ${country2}` : '');
     meta.industry = industry; if(country2) meta.country = country2;
+  } else if(currentTrack === 'D'){
+    const topic = selectedTopicOf('D');
+    trackRule = `트랙 D — Korean Dating Signals
+목적: 한국 연애 문화에서 나타나는 특정 상황의 "시그널(signal)"을 외국인 여성 시청자에게 흥미롭고 이해하기 쉽게 풀어주는 K-컬처 숏폼 콘텐츠를 기획합니다.
+핵심 방향: 실제로 관찰되는 문화적 패턴을 가볍고 흥미로운 인사이트처럼 전달하되, 절대 모든 한국 남성/여성에게 해당된다고 단정하지 말고 "많은 사람들", "때때로", "한국 연애 문화에서는" 같은 뉘앙스로 소개합니다. K-drama에서 그려지는 모습과 실제 현실의 차이도 다룰 수 있습니다.
+타깃: 한국 문화·K-드라마·한국 연애에 관심 있는 외국인 여성 (TikTok/Reels/Shorts 시청자).
+톤: 재밌고 살짝 플러팅하며 따뜻한 "인사이더 팁" 톤. 지나치게 학술적이거나 자극적(clickbait)이지 않게.
+반드시 포함: 다루는 시그널이 나타나는 구체적 상황/행동 예시, 그것이 왜 그런 의미로 여겨지는지 문화적 맥락, 오해하지 말아야 할 점(모든 사람에게 해당되지 않음을 짚어주기).
+절대 피할 것: "all Korean men/women" 같은 절대화, 성차별적 일반화, 실존 인물 언급, 영업/상담 유도 문구.
+${DEF_GLOBAL_RULES}
+추천 콘텐츠 구조: Hook(궁금증을 유발하는 반전/질문) → Dating Situation 소개 → What it might mean(문화적 의미) → What not to misunderstand(오해 주의) → Short Script/Scene Breakdown → Caption/Hashtags/CTA Question(댓글 유도 질문).
+다루는 주제: ${topic || '(창의적으로 흥미로운 한국 연애 시그널 주제 하나를 직접 선정)'}`;
+    meta.topic = topic;
+  } else if(currentTrack === 'E'){
+    const topic = selectedTopicOf('E');
+    trackRule = `트랙 E — Korean Word Nuance
+목적: 특정 한국어 단어/표현이 말투와 상황에 따라 뜻이 어떻게 달라지는지, 외국인 여성 시청자에게 쉽고 재미있게 풀어주는 K-컬처 언어 콘텐츠를 기획합니다. 단순 사전적 번역이 아니라 감정적·문화적 뉘앙스를 짚어줍니다.
+핵심 방향: 이 단어/표현이 왜 외국인에게 헷갈리는지, 톤(부드럽게/무덤덤하게/차갑게 등)에 따라 의미가 어떻게 달라지는지 구체적인 상황 예시로 설명합니다.
+타깃: 한국어·K-컬처에 관심 있는 외국인 여성 학습자/팬 (TikTok/Reels/Shorts 시청자).
+톤: 언어 선생님 같은 친근함 + 약간의 문화적 위트, "이래서 한국어가 어렵구나" 하고 저장하고 싶게.
+반드시 포함: 다루는 한국어 표현 원문(반드시 한글 그대로), 사전적 의미, 톤별 실제 의미 차이, 실제 쓰이는 상황 예문 1~2개.
+절대 피할 것: 한국어 표현을 다른 언어로 그냥 번역해버리는 것(반드시 원문 유지), 지나치게 딱딱한 사전적 정의, 문화 일반화, 영업/상담 유도 문구.
+${DEF_GLOBAL_RULES}
+매우 중요: 한국어 표현 자체는 절대 번역하지 말고 원문 한글 그대로("됐어요", "괜찮아요", "밥 먹었어?" 등) 유지하고, 그 옆에 선택된 언어로 뜻과 뉘앙스만 설명하세요.
+추천 콘텐츠 구조: Hook(이 단어 뜻 아세요? 류) → Korean Phrase(원문+발음) 소개 → Literal Meaning → Real Meanings by Tone → Situation Examples → Short Script/Scene Breakdown → Caption/Hashtags/CTA Question.
+다루는 한국어 표현/주제: ${topic || '(창의적으로 외국인이 헷갈려할 만한 한국어 표현 하나를 직접 선정)'}`;
+    meta.topic = topic;
+  } else if(currentTrack === 'F'){
+    const topic = selectedTopicOf('F');
+    trackRule = `트랙 F — K-Personality & Beauty Mood
+목적: MBTI, 혈액형 성격론, K-beauty, 데이트룩 스타일링, 성격 테스트 형식 등 재미있는 K-personality/beauty 콘텐츠를 기획합니다.
+핵심 방향: 가볍고 공감을 유도하는(relatable) 톤으로, 시청자가 "이거 나야?"라고 댓글을 달고 싶게 만듭니다. MBTI/혈액형 이야기는 반드시 과학적 사실이 아니라 "그냥 재미로 하는 것(just for fun)", "한국 카페에서 하는 수다(Korean cafe talk)"라는 톤으로 다룹니다.
+타깃: K-pop/K-beauty/성격테스트에 관심 있는 외국인 여성 (TikTok/Reels/Shorts 시청자).
+톤: 발랄하고 캐주얼하며 공감/재미 위주, 절대 의학적·과학적 사실처럼 단정하지 않기.
+반드시 포함: 다루는 유형/카테고리(랭킹 또는 리스트 형태 가능), 구체적인 성격 특징 묘사 또는 룩/제품 스타일링 설명, 시청자가 자신을 대입해볼 수 있는 포인트, "not science, just for fun" 톤의 명시적 언급.
+절대 피할 것: 의학적/과학적 사실처럼 단정, 특정 혈액형·MBTI에 대한 부정적 낙인, 특정 브랜드 과도한 홍보, 영업/상담 유도 문구.
+${DEF_GLOBAL_RULES}
+추천 콘텐츠 구조: Hook(너 혹시 이런 스타일? 류) → Ranking or List 또는 유형 소개 → Personality Explanation("just for fun"/"Korean cafe talk" 톤 포함) 또는 K-beauty/Visual Direction → Short Script/Scene Breakdown → Caption/Hashtags/CTA Question(댓글로 자기 유형 남기게 유도).
+다루는 주제: ${topic || '(창의적으로 흥미로운 K-personality/beauty 주제 하나를 직접 선정)'}`;
+    meta.topic = topic;
   }
   return { trackRule, meta };
 }
 
 function buildOutlinePrompt(){
-  const slideCount = document.getElementById('f-slides').value;
   const brief = document.getElementById('f-brief').value.trim();
   const { trackRule, meta } = getTrackGuidance();
+  const isShortform = isDefTrack(currentTrack) && currentFormat === 'shortform';
 
-  const prompt = `당신은 카드뉴스 기획자입니다. 아래 지침에 맞는 카드뉴스의 슬라이드별 "기획안(아웃라인)"을 한국어로 작성하세요.
-이 단계는 실제 카피가 아니라, 담당자가 방향을 검토·수정할 수 있도록 각 슬라이드에 어떤 내용이 들어갈지 간단히 설명하는 단계입니다.
+  const structureRule = isShortform
+    ? `정확히 7개 항목으로 구성하세요: 1) Title, 2) Viral Hook, 3) Short Script, 4) Scene Breakdown, 5) Caption, 6) Hashtags, 7) CTA Question. 각 항목의 role 필드는 정확히 "Title"/"Viral Hook"/"Short Script"/"Scene Breakdown"/"Caption"/"Hashtags"/"CTA Question" 중 하나여야 합니다. 위 트랙 지침에서 설명한 트랙별 필수 내용(예: 데이트 시그널의 의미, 한국어 표현의 뉘앙스, 성격·뷰티 랭킹 등)은 "Short Script"와 "Scene Breakdown" 항목 안에 자연스럽게 녹여서 설명하세요.`
+    : `정확히 ${document.getElementById('f-slides').value}개 슬라이드로 구성하세요. 각 슬라이드는 위 추천 콘텐츠 구조의 단계 중 하나에 순서대로 대응해야 합니다.`;
+
+  const prompt = `당신은 ${isShortform ? '틱톡/릴스/쇼츠용 숏폼 콘텐츠 기획자' : '카드뉴스 기획자'}입니다. 아래 지침에 맞는 콘텐츠의 "기획안(아웃라인)"을 한국어로 작성하세요.
+이 단계는 실제 완성 카피가 아니라, 담당자가 방향을 검토·수정할 수 있도록 각 항목에 어떤 내용이 들어갈지 간단히 설명하는 단계입니다.
 
 ${trackRule}
 
 ${brief ? '추가 요청사항(추가·삭제·디자인 지시 포함 가능): ' + brief : ''}
 
 규칙:
-- 정확히 ${slideCount}개 슬라이드로 구성하세요.
-- 각 슬라이드는 위 추천 콘텐츠 구조의 단계 중 하나에 순서대로 대응해야 합니다.
+- ${structureRule}
 - 추가 요청사항에 특정 항목을 빼거나 더 강조하라는 지시가 있으면 그에 맞게 구조를 조정하세요.
 - 응답은 오직 JSON 객체 하나만 출력하세요. 코드블록이나 설명 문구는 절대 붙이지 마세요.
-- JSON 형식: {"slides":[{"role":"단계명(예: Hook)","note":"이 슬라이드에 어떤 내용이 들어갈지 1~2문장 한국어로 설명"}]}`;
+- JSON 형식: {"slides":[{"role":"단계명(예: Hook)","note":"이 항목에 어떤 내용이 들어갈지 1~2문장 한국어로 설명"}]}`;
 
   return { prompt, meta };
 }
 
 function buildPrompt(outline){
-  const language = document.getElementById('f-language').value;
-  const slideCount = document.getElementById('f-slides').value;
-  const tone = document.getElementById('f-tone').value;
-  const brief = document.getElementById('f-brief').value.trim();
+  if(isDefTrack(currentTrack) && currentFormat === 'shortform'){
+    return buildShortformPrompt(outline);
+  }
 
-  const languageNote = language === '한국어' ? '' : `
+  const def = isDefTrack(currentTrack);
+  const slideCount = document.getElementById('f-slides').value;
+  const brief = document.getElementById('f-brief').value.trim();
+  const { trackRule, meta } = getTrackGuidance();
+
+  let base;
+  let language;
+  if(def){
+    const langKey = document.getElementById('f-language-def').value;
+    const langInfo = DEF_LANGUAGES[langKey];
+    language = langInfo.name;
+    meta.defLanguage = langKey; meta.languageCode = langInfo.code;
+
+    base = `당신은 외국인 여성 타깃 K-컬처 숏폼(TikTok/Reels/Shorts) 채널의 카드뉴스(캐러셀 슬라이드) 콘텐츠 기획자입니다. 이 콘텐츠는 영업 자료가 아니라 재미있고 저장하고 싶은 TikTok/Reels 콘텐츠 카드입니다.
+반드시 지켜야 할 규칙:
+- 응답은 오직 하나의 JSON 객체만 출력하세요. 코드블록 표시나 설명 문구를 절대 붙이지 마세요.
+- JSON 형식: {"title":"...", "caption":"...", "slides":[{"headline":"...", "body":"..."}]}
+- caption은 게시물에 붙일 짧은 설명(2~3문장, 해시태그 8~12개 포함, 선택 언어 현지 해시태그와 글로벌 영어 해시태그를 섞어서)입니다.
+- slides는 정확히 ${slideCount}개 작성하세요.
+- 첫 번째 슬라이드(slides[0])는 스크롤을 멈추게 하는 강력한 훅(Viral Hook)이어야 합니다. 질문형, 반전, 의외의 사실 등을 활용한 아주 짧고 임팩트 있는 헤드라인으로 작성하고, body는 한 문장짜리 짧은 티저만 넣으세요.
+- 두 번째 슬라이드부터는 헤드라인을 짧고 강렬하게 쓰고, body는 2문장 이내로 간결하게 작성하세요. 영업 문구나 상담/문의 CTA 대신, 댓글·저장·공유를 유도하는 마지막 CTA Question으로 마무리하세요.
+- 느낌표 남발이나 과장된 이모지 없이, 단어 선택만으로 임팩트를 주세요.
+- 모든 텍스트는 "${language}"로, 다음 톤으로 작성하세요: ${langInfo.tone}. 교과서적이거나 격식 있는 번역투 표현은 피하고, 해당 언어권 SNS에서 실제로 쓰는 자연스러운 표현을 쓰세요.
+- 한국어 단어/표현을 언급할 때는 절대 다른 언어로 번역하지 말고 원문 한글 그대로 쓰고, 바로 옆에 "${language}"로 쉬운 뜻을 설명하세요.`;
+  } else {
+    const tone = document.getElementById('f-tone').value;
+    language = document.getElementById('f-language').value;
+    meta.tone = tone;
+    const languageNote = language === '한국어' ? '' : `
 - 절대 한국어 문장을 직역한 것처럼 쓰지 마세요. "${language}"를 모국어로 쓰는 사람이 이 업계 SNS 게시물을 볼 때 자연스럽게 읽히는 문장으로, 처음부터 그 언어로 생각해서 작성하세요.
 - 교과서적이거나 격식 있는 번역투 표현은 피하고, 해당 언어권 SNS·업계에서 실제로 쓰는 표현을 쓰세요.` + (tone === 'casual' ? `
 - 또래끼리 대화하듯 캐주얼한 구어체와, 해당 언어권에서 지금 실제로 쓰이는 유행어·인터넷 밈 표현을 적극 활용하세요. 딱딱한 존댓말투나 뉴스 문어체는 쓰지 마세요.` : '');
 
-  const base = `당신은 의료관광 에이전시의 SNS 카드뉴스 카피라이터입니다. 인스타그램·페이스북·틱톡에 슬라이드 형식으로 올릴 카드뉴스를 기획하세요.
+    base = `당신은 의료관광 에이전시의 SNS 카드뉴스 카피라이터입니다. 인스타그램·페이스북·틱톡에 슬라이드 형식으로 올릴 카드뉴스를 기획하세요.
 반드시 지켜야 할 규칙:
 - 회사명, 법인명, 특정 병원 실명을 절대 언급하지 마세요.
 - 협찬이나 제휴 문의는 "DM으로 문의해주세요" 식으로만 안내하세요.
@@ -1009,13 +1275,44 @@ function buildPrompt(outline){
 - 두 번째 슬라이드부터는 헤드라인을 15~22자 내외로 짧고 강렬하게 쓰고, body는 2문장 이내로 간결하게 작성하세요.
 - 느낌표 남발이나 과장된 이모지 없이, 단어 선택만으로 임팩트를 주세요.
 - 모든 텍스트는 "${language}"로 작성하세요.${languageNote}`;
+  }
 
-  const { trackRule, meta } = getTrackGuidance();
-  meta.language = language; meta.slideCount = slideCount; meta.tone = tone;
+  meta.language = language; meta.slideCount = slideCount;
 
   const outlineBlock = outline && outline.length ? `\n\n아래 승인된 기획안의 구조와 내용을 그대로 따라 슬라이드를 작성하세요. 각 항목은 슬라이드 순서와 1:1로 대응됩니다 (항목 개수만큼 슬라이드를 작성하세요):\n` + outline.map((o,i)=>`${i+1}. [${o.role}] ${o.note}`).join('\n') : '';
 
   const full = base + '\n\n' + trackRule + (brief ? `\n\n추가 요청사항: ${brief}` : '') + outlineBlock + (refLinks.length ? `\n\n참고 링크(직접 열람은 불가하니 주제·톤 참고용으로만 감안하세요): ${refLinks.join(', ')}` : '') + (attachedImages.length ? `\n\n첨부된 이미지가 있습니다. 이미지 속 분위기, 장소, 시술 부위 등을 참고해서 카피에 반영하세요.` : '');
+  return { prompt: full, meta };
+}
+
+function buildShortformPrompt(outline){
+  const brief = document.getElementById('f-brief').value.trim();
+  const { trackRule, meta } = getTrackGuidance();
+  const langKey = document.getElementById('f-language-def').value;
+  const langInfo = DEF_LANGUAGES[langKey];
+  meta.format = 'shortform';
+  meta.defLanguage = langKey;
+  meta.languageCode = langInfo.code;
+  meta.language = langInfo.name;
+
+  const base = `당신은 외국인 여성 타깃 K-컬처 숏폼(TikTok/Reels/Shorts) 콘텐츠 기획자입니다. 이 콘텐츠는 영업 자료가 아니라 재미있고 저장·공유하고 싶은 TikTok/Reels/Shorts용 대본입니다.
+반드시 지켜야 할 규칙:
+- 응답은 오직 하나의 JSON 객체만 출력하세요. 코드블록이나 설명 문구를 절대 붙이지 마세요.
+- JSON 형식: {"title":"...", "hook":"...", "script":"...", "sceneBreakdown":"...", "caption":"...", "hashtags":["...","..."], "ctaQuestion":"..."}
+- title: 이 영상의 제목 ("${langInfo.name}"로, 한 줄).
+- hook: 영상 첫 1~2초에 쓸 매우 강력한 후킹 대사 또는 화면 텍스트 (Viral Hook, "${langInfo.name}"로 한 문장, 아주 짧고 임팩트 있게).
+- script: 15~30초 분량으로 실제 말하거나 화면에 띄울 짧은 스크립트 전문 ("${langInfo.name}"로, 위 트랙 지침의 "반드시 포함" 내용을 자연스럽게 녹여서 작성).
+- sceneBreakdown: 실제 촬영/AI 이미지·영상 제작에 바로 쓸 수 있도록 장면 단위로 나눈 설명 (Scene 1, Scene 2... 형식의 줄바꿈 텍스트, "${langInfo.name}"로 작성).
+- caption: TikTok/Reels/Shorts 게시물용 짧은 캡션 (2~3문장, "${langInfo.name}"로).
+- hashtags: 8~12개의 해시태그 배열 (# 포함). 선택 언어 현지 해시태그와 글로벌 영어 해시태그를 섞어서 작성하세요.
+- ctaQuestion: 댓글을 유도하는 질문형 CTA 한 문장 ("${langInfo.name}"로).
+- 모든 텍스트는 "${langInfo.name}"로 작성하고, 다음 톤을 지키세요: ${langInfo.tone}. 교과서적인 번역투가 아니라 해당 언어권 TikTok/Reels에서 실제로 쓰는 자연스러운 표현을 쓰세요.
+- 한국어 단어/표현을 언급할 때는 절대 다른 언어로 번역하지 말고 원문 한글 그대로 쓰고, 바로 옆에 "${langInfo.name}"로 쉬운 뜻과 뉘앙스를 설명하세요.
+- 문장은 짧고 리듬감 있게, 바로 촬영·게시에 쓸 수 있는 수준으로 구체적으로 작성하세요.`;
+
+  const outlineBlock = outline && outline.length ? `\n\n아래 승인된 기획안을 그대로 반영하여 각 필드를 작성하세요:\n` + outline.map((o,i)=>`${i+1}. [${o.role}] ${o.note}`).join('\n') : '';
+
+  const full = base + '\n\n' + trackRule + (brief ? `\n\n추가 요청사항: ${brief}` : '') + outlineBlock + (refLinks.length ? `\n\n참고 링크(직접 열람은 불가하니 주제·톤 참고용으로만 감안하세요): ${refLinks.join(', ')}` : '');
   return { prompt: full, meta };
 }
 
@@ -1052,8 +1349,6 @@ function apiErrorMessage(hasProxy){
     ? '요청에 실패했습니다. 프록시 서버 주소나 팀 코드가 올바른지 확인해주세요.'
     : '요청에 실패했습니다. 이 화면은 Claude.ai 아티팩트로 열었을 때만 API가 동작해요 — 팀 전체가 쓰려면 위 "프록시 서버 설정"에 Worker 주소를 입력해주세요.';
 }
-
-let currentOutline = null;
 
 async function generateOutline(){
   showGenError('');
@@ -1109,35 +1404,45 @@ document.getElementById('btn-regen-outline').addEventListener('click', generateO
 document.getElementById('btn-generate-from-outline').addEventListener('click', async ()=>{
   showGenError('');
   const btn = document.getElementById('btn-generate-from-outline');
+  const isShortform = isDefTrack(currentTrack) && currentFormat === 'shortform';
   btn.disabled = true;
   btn.textContent = '생성 중...';
   document.getElementById('preview-box').style.display = 'none';
+  document.getElementById('shortform-preview-box').style.display = 'none';
   try{
     const { prompt, meta } = buildPrompt(currentOutline);
     const contentBlocks = [];
-    attachedImages.slice(0,3).forEach(img=>{
-      const match = img.dataUrl.match(/^data:(.*?);base64,(.*)$/);
-      if(match){
-        contentBlocks.push({ type:'image', source:{ type:'base64', media_type: match[1], data: match[2] } });
-      }
-    });
+    if(!isShortform){
+      attachedImages.slice(0,3).forEach(img=>{
+        const match = img.dataUrl.match(/^data:(.*?);base64,(.*)$/);
+        if(match){
+          contentBlocks.push({ type:'image', source:{ type:'base64', media_type: match[1], data: match[2] } });
+        }
+      });
+    }
     contentBlocks.push({ type:'text', text: prompt });
 
     const clean = await callClaude(contentBlocks);
     const parsed = JSON.parse(clean);
-    if(!parsed.title || !Array.isArray(parsed.slides)) throw new Error('형식 오류');
-    currentGenerated = { ...parsed, meta, refLinks: refLinks.slice() };
-    if(attachedImages.length){
-      slideImageMap = {};
-      parsed.slides.forEach((_,i)=>{ if(attachedImages[i]) slideImageMap[i] = attachedImages[i].id; });
+    if(isShortform){
+      if(!parsed.title || !parsed.hook || !parsed.script) throw new Error('형식 오류');
+      currentGenerated = { ...parsed, meta, refLinks: refLinks.slice() };
+      renderShortformPreview();
+    } else {
+      if(!parsed.title || !Array.isArray(parsed.slides)) throw new Error('형식 오류');
+      currentGenerated = { ...parsed, meta, refLinks: refLinks.slice() };
+      if(attachedImages.length){
+        slideImageMap = {};
+        parsed.slides.forEach((_,i)=>{ if(attachedImages[i]) slideImageMap[i] = attachedImages[i].id; });
+      }
+      renderPreview();
     }
-    renderPreview();
   }catch(e){
     console.error(e);
     showGenError(apiErrorMessage(!!(await getProxySettings()).url));
   }finally{
     btn.disabled = false;
-    btn.textContent = '이 기획안으로 카드뉴스 생성';
+    btn.textContent = isShortform ? '이 기획안으로 숏폼 생성' : '이 기획안으로 카드뉴스 생성';
   }
 });
 
@@ -1155,6 +1460,20 @@ const PALETTES = {
     { name:'테라코타', bg:'#5C2C1F' },
     { name:'카라멜', bg:'#6B4A1F' },
     { name:'버건디', bg:'#5C1F30' }
+  ],
+  D: [
+    { name:'플럼미스트', bg:'#3E2F5C' },
+    { name:'라일락더스크', bg:'#4A3968' },
+    { name:'베리와인', bg:'#4A2740' }
+  ],
+  E: [
+    { name:'세이지틸', bg:'#1F4A42' },
+    { name:'모스그린', bg:'#2A4A2E' }
+  ],
+  F: [
+    { name:'로즈모브', bg:'#5C2A48' },
+    { name:'더스티핑크', bg:'#6B3450' },
+    { name:'라벤더로즈', bg:'#4A2F52' }
   ],
   country: {
     '일본': [
@@ -1191,7 +1510,7 @@ function buildSlideEl(track, headline, body, idx, total, isCover, imgDataUrl, bg
   const el = document.createElement('div');
   el.className = 'vslide ' + TRACK_CLASS[track] + (isCover ? ' cover' : '') + (imgDataUrl ? ' has-img' : '');
   if(bgColor) el.style.backgroundColor = bgColor;
-  const eyebrowText = { A:'AGENT RECRUIT', B:'PARTNER INVITE', C:'COLLAB PROPOSAL' }[track];
+  const eyebrowText = { A:'AGENT RECRUIT', B:'PARTNER INVITE', C:'COLLAB PROPOSAL', D:'DATING SIGNALS', E:'WORD NUANCE', F:'PERSONALITY & GLOW' }[track];
   el.innerHTML = `
     ${imgDataUrl ? `<img class="bgimg" src="${imgDataUrl}" alt="" />` : ''}
     <div class="accentbar"></div>
@@ -1293,6 +1612,7 @@ document.getElementById('btn-save-lib').addEventListener('click', async ()=>{
   const item = {
     id: uid(),
     track: currentGenerated.meta.track,
+    format: 'cardnews',
     meta: currentGenerated.meta,
     title: currentGenerated.title,
     caption: currentGenerated.caption,
@@ -1312,6 +1632,85 @@ document.getElementById('btn-save-lib').addEventListener('click', async ()=>{
   slideImageMap = {};
   refLinks = [];
   renderImageGallery();
+  renderRefLinks();
+  renderLibrary();
+  renderHome();
+  document.querySelector('.navitem[data-tab="lib"]').click();
+});
+
+// ---------- shortform (텍스트 블록) ----------
+function shortformSectionsOf(item){
+  return [
+    { key:'title', label:'Title', text:item.title },
+    { key:'hook', label:'Viral Hook', text:item.hook },
+    { key:'script', label:'Short Script', text:item.script },
+    { key:'sceneBreakdown', label:'Scene Breakdown', text:item.sceneBreakdown },
+    { key:'caption', label:'Caption', text:item.caption },
+    { key:'hashtags', label:'Hashtags', text:Array.isArray(item.hashtags) ? item.hashtags.join(' ') : (item.hashtags||'') },
+    { key:'ctaQuestion', label:'CTA Question', text:item.ctaQuestion }
+  ];
+}
+
+function sfBlocksHtml(item, idPrefix){
+  return shortformSectionsOf(item).map(s=>`
+    <div class="sf-block">
+      <div class="sf-block-head">
+        <span class="sf-block-label">${escapeHtml(s.label)}</span>
+        <button class="btn small secondary sf-copy-btn" data-target="${idPrefix}-${s.key}" type="button">복사</button>
+      </div>
+      <div class="sf-block-body" id="${idPrefix}-${s.key}">${escapeHtml(s.text||'')}</div>
+    </div>
+  `).join('');
+}
+
+function wireSfCopyButtons(container){
+  container.querySelectorAll('.sf-copy-btn').forEach(btn=>{
+    btn.addEventListener('click', async ()=>{
+      const target = document.getElementById(btn.dataset.target);
+      const text = target ? target.textContent : '';
+      try{
+        await navigator.clipboard.writeText(text);
+        const orig = btn.textContent;
+        btn.textContent = '복사됨';
+        setTimeout(()=>{ btn.textContent = orig; }, 1200);
+      }catch(e){
+        alert('복사에 실패했습니다.');
+      }
+    });
+  });
+}
+
+function renderShortformPreview(){
+  if(!currentGenerated) return;
+  document.getElementById('preview-box').style.display = 'none';
+  const box = document.getElementById('shortform-preview-box');
+  box.style.display = 'block';
+  const wrap = document.getElementById('shortform-sections');
+  wrap.innerHTML = sfBlocksHtml(currentGenerated, 'sf');
+  wireSfCopyButtons(wrap);
+}
+
+document.getElementById('btn-save-lib-shortform').addEventListener('click', async ()=>{
+  if(!currentGenerated) return;
+  const item = {
+    id: uid(),
+    track: currentGenerated.meta.track,
+    format: 'shortform',
+    meta: currentGenerated.meta,
+    title: currentGenerated.title,
+    hook: currentGenerated.hook,
+    script: currentGenerated.script,
+    sceneBreakdown: currentGenerated.sceneBreakdown,
+    caption: currentGenerated.caption,
+    hashtags: currentGenerated.hashtags || [],
+    ctaQuestion: currentGenerated.ctaQuestion,
+    createdAt: new Date().toISOString(),
+    uploads: [],
+    refLinks: currentGenerated.refLinks || []
+  };
+  state.cardnews.unshift(item);
+  await saveArr('cardnews:items', state.cardnews);
+  refLinks = [];
   renderRefLinks();
   renderLibrary();
   renderHome();
@@ -1341,11 +1740,13 @@ function renderLibrary(){
   wrap.innerHTML = items.map(item=>{
     const status = item.uploads.length>0 ? '업로드됨' : '생성됨';
     const statusClass = item.uploads.length>0 ? 'status-ok' : 'status-pending';
+    const isShortform = item.format === 'shortform';
     const metaLine = [
       item.meta.country ? '국가: '+item.meta.country : null,
       item.meta.industry ? '업종: '+item.meta.industry : null,
       item.meta.role ? '직무: '+item.meta.role : null,
-      '언어: '+item.meta.language,
+      item.meta.topic ? '주제: '+item.meta.topic : null,
+      item.meta.defLanguage ? '언어: '+item.meta.defLanguage : ('언어: '+item.meta.language),
       item.meta.paletteName ? '톤: '+item.meta.paletteName : null
     ].filter(Boolean).join(' · ');
     const uploadChips = item.uploads.map(u=>`<span class="upload-chip">${escapeHtml(u.platform)} · ${escapeHtml(u.account)}</span>`).join('');
@@ -1355,6 +1756,7 @@ function renderLibrary(){
       <div class="item-top">
         <span class="badge ${TRACK_CLASS[item.track]}">${TRACK_LABEL[item.track]}</span>
         <span class="badge ${statusClass}">${status}</span>
+        <span class="badge status-muted">${isShortform ? '텍스트 블록' : '카드뉴스'}</span>
         <span class="item-title">${escapeHtml(item.title)}</span>
       </div>
       <div class="item-meta">${metaLine} · 생성일 ${new Date(item.createdAt).toLocaleDateString('ko-KR')}</div>
@@ -1362,11 +1764,15 @@ function renderLibrary(){
       ${refChips ? `<div style="margin-bottom:8px;">${refChips}</div>` : ''}
       <div class="upload-list">${uploadChips}</div>
       <div class="item-actions">
-        <button class="btn small secondary btn-toggle-images">이미지 보기·다운로드</button>
+        ${isShortform
+          ? `<button class="btn small secondary btn-toggle-sf">본문 보기·복사</button>`
+          : `<button class="btn small secondary btn-toggle-images">이미지 보기·다운로드</button>`}
         <button class="btn small secondary btn-toggle-upload">업로드 정보 추가</button>
         <button class="btn small secondary btn-delete-item">삭제</button>
       </div>
-      <div class="slide-grid" id="images-${item.id}" style="display:none;margin-top:12px;"></div>
+      ${isShortform
+        ? `<div id="sf-detail-${item.id}" style="display:none;margin-top:12px;"></div>`
+        : `<div class="slide-grid" id="images-${item.id}" style="display:none;margin-top:12px;"></div>`}
       <div class="upload-form" id="upload-form-${item.id}">
         <div class="field-row">
           <div class="field"><label>플랫폼</label><input type="text" class="up-platform" placeholder="Instagram 등" /></div>
@@ -1400,6 +1806,21 @@ function renderLibrary(){
         btn.textContent = origText;
       }
       box.style.display = 'flex';
+    });
+  });
+  wrap.querySelectorAll('.btn-toggle-sf').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      const id = e.target.closest('.item-row').dataset.id;
+      const box = document.getElementById('sf-detail-'+id);
+      const isOpen = box.style.display !== 'none';
+      if(isOpen){ box.style.display = 'none'; return; }
+      const item = state.cardnews.find(i=>i.id===id);
+      if(!box.dataset.rendered){
+        box.innerHTML = sfBlocksHtml(item, 'sf-'+id);
+        wireSfCopyButtons(box);
+        box.dataset.rendered = '1';
+      }
+      box.style.display = 'block';
     });
   });
   wrap.querySelectorAll('.btn-toggle-upload').forEach(btn=>{
@@ -1625,7 +2046,7 @@ function renderHome(){
   `;
 
   const recent = [];
-  state.cardnews.slice(0,3).forEach(i=>recent.push({ t:new Date(i.createdAt).getTime(), text:`[${TRACK_LABEL[i.track]}] 카드뉴스 "${i.title}" 생성됨` }));
+  state.cardnews.slice(0,3).forEach(i=>recent.push({ t:new Date(i.createdAt).getTime(), text:`[${TRACK_LABEL[i.track]}] ${i.format==='shortform' ? '숏폼 초안' : '카드뉴스'} "${i.title}" 생성됨` }));
   state.outreach.slice(0,3).forEach(i=>recent.push({ t:new Date(i.date).getTime()||0, text:`[${TRACK_LABEL[i.track]}] ${i.target}에 DM 발송 (${i.status})` }));
   state.contracts.slice(0,3).forEach(i=>recent.push({ t:new Date(i.date).getTime()||0, text:`[${TRACK_LABEL[i.track]}] ${i.name} 계약 상태: ${i.status}` }));
   recent.sort((a,b)=>b.t-a.t);
